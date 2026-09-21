@@ -1,135 +1,24 @@
-/**
- * =========================================================================
- * Incentive Calculator Pro - UI Adapter
- * =========================================================================
- * The business rules live in calculation-engine.js. This file only binds
- * those reusable functions to the existing calculator DOM.
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    const zoneSelect = document.getElementById('calc-zone');
-    const sizeSInput = document.getElementById('calc-size-s');
-    const sizeLInput = document.getElementById('calc-size-l');
-
-    const resTotalParcel = document.getElementById('res-total-parcel');
-    const resGrandTotal = document.getElementById('res-grand-total');
-    const breakdownBody = document.getElementById('breakdown-body');
-    const btnSave = document.getElementById('btn-save');
-    const calculationEngine = window.CWCalculationEngine;
-
-    const formInputs = [
-        document.getElementById('calc-date'),
-        zoneSelect,
-        document.getElementById('calc-hub'),
-        document.getElementById('calc-rider'),
-        sizeSInput,
-        sizeLInput
-    ];
-
-    function initZones() {
-        zoneSelect.innerHTML = '<option value="" selected disabled>-- เลือกโซน --</option>';
-        for (const zone in ZONES_CONFIG) {
-            const option = document.createElement('option');
-            option.value = zone;
-            option.textContent = zone;
-            zoneSelect.appendChild(option);
-        }
-    }
-
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    function getNonNegativeInputValue(input) {
-        const value = Number(input.value);
-        return Number.isInteger(value) && value >= 0 ? value : null;
-    }
-
-    function calculateIncentive() {
-        const zoneName = zoneSelect.value;
-        const totalS = getNonNegativeInputValue(sizeSInput);
-        const totalL = getNonNegativeInputValue(sizeLInput);
-        const totalParcels = (totalS ?? 0) + (totalL ?? 0);
-
-        resTotalParcel.textContent = totalParcels.toLocaleString();
-
-        if (!calculationEngine || !zoneName || !ZONES_CONFIG[zoneName] || totalS === null || totalL === null || totalParcels === 0) {
-            window.cwCurrentCalculation = null;
-            resetResultUI();
-            checkSaveButton();
-            return;
-        }
-
-        const result = calculationEngine.calculate4W(totalS, totalL, zoneName, 0);
-        window.cwCurrentCalculation = result;
-
-        resGrandTotal.textContent = `฿${result.grossIncentive.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        })}`;
-        breakdownBody.innerHTML = result.tierBreakdown.map(tier => `
-            <tr>
-                <td class="fw-medium">${tier.label}</td>
-                <td class="text-center text-primary">${tier.sizeS}</td>
-                <td class="text-center text-warning">${tier.sizeL}</td>
-                <td class="text-end text-muted">฿${tier.rateS} / ฿${tier.rateL}</td>
-                <td class="text-end fw-bold">฿${tier.amount.toLocaleString()}</td>
-            </tr>
-        `).join('');
-
-        checkSaveButton();
-    }
-
-    function resetResultUI() {
-        resGrandTotal.textContent = '฿0.00';
-        breakdownBody.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center text-muted py-4">
-                    กรอกจำนวนพัสดุเพื่อดูรายละเอียดการคำนวณแต่ละขั้น
-                </td>
-            </tr>
-        `;
-    }
-
-    function checkSaveButton() {
-        const isDateFilled = document.getElementById('calc-date').value !== '';
-        const isZoneFilled = zoneSelect.value !== '';
-        const isHubFilled = document.getElementById('calc-hub').value.trim() !== '';
-        const isRiderFilled = document.getElementById('calc-rider').value.trim() !== '';
-        const sizeS = getNonNegativeInputValue(sizeSInput);
-        const sizeL = getNonNegativeInputValue(sizeLInput);
-        const totalParcels = (sizeS ?? 0) + (sizeL ?? 0);
-
-        btnSave.disabled = !(isDateFilled && isZoneFilled && isHubFilled && isRiderFilled && totalParcels > 0);
-    }
-
-    const liveCalculate = debounce(calculateIncentive, 150);
-    formInputs.forEach(input => {
-        if (input) {
-            input.addEventListener('input', liveCalculate);
-            input.addEventListener('change', liveCalculate);
-        }
-    });
-
-    document.getElementById('btn-reset').addEventListener('click', () => {
-        document.getElementById('calculator-form').reset();
-        sizeSInput.value = '0';
-        sizeLInput.value = '0';
-        resTotalParcel.textContent = '0';
-        window.cwCurrentCalculation = null;
-        resetResultUI();
-        checkSaveButton();
-        document.getElementById('calc-date').valueAsDate = new Date();
-    });
-
-    initZones();
-    document.getElementById('calc-date').valueAsDate = new Date();
+  const $ = id => document.getElementById(id);
+  const engine = window.CWCalculationEngine;
+  const zone = $('calc-zone'), s = $('calc-size-s'), l = $('calc-size-l'), parcel = $('calc-parcel'), same = $('calc-same-address');
+  const resultFields = {total:$('res-total-parcel'), grand:$('res-grand-total'), gross:$('res-gross'), same:$('res-same'), deduction:$('res-deduction'), net:$('res-net'), body:$('breakdown-body'), error:$('calc-error'), save:$('btn-save')};
+  let vehicle = '4W';
+  const money = n => `฿${Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const integer = el => { const n=Number(el?.value); return Number.isInteger(n)&&n>=0?n:null; };
+  function initZones(){ zone.innerHTML='<option value="" selected disabled>เลือกโซน</option>'; Object.keys(ZONES_CONFIG).forEach(z=>{const o=document.createElement('option');o.value=z;o.textContent=z;zone.appendChild(o);}); }
+  function setVehicle(type){ vehicle=type; document.querySelectorAll('[data-vehicle-tab]').forEach(x=>x.classList.toggle('active',x.dataset.vehicleTab===type)); $('two-w-inputs').classList.toggle('hidden',type!=='2W'); $('four-w-inputs').classList.toggle('hidden',type!=='4W'); $('same-address-rate').textContent=type==='2W'?'อัตราหักบ้านซ้ำ ฿1.50 / ชิ้น':'อัตราหักบ้านซ้ำ ฿2.50 / ชิ้น'; calculate(); }
+  function renderBreakdown(rows){ if(!rows?.length){resultFields.body.innerHTML='<tr><td colspan="5" class="empty-cell">กรอกข้อมูลเพื่อดูรายละเอียด</td></tr>';return;} resultFields.body.innerHTML=rows.map(t=>`<tr><td>${t.label}</td><td>${vehicle==='4W'?t.sizeS:'-'}</td><td>${vehicle==='4W'?t.sizeL:t.parcel}</td><td>${vehicle==='4W'?`${t.rateS}/${t.rateL}`:t.rate}</td><td>${money(t.amount)}</td></tr>`).join(''); }
+  function calculate(){
+    resultFields.error.textContent=''; const z=zone.value; const sameCount=integer(same); let result=null;
+    try { if(!engine||!z||sameCount===null){throw new Error('กรุณากรอกข้อมูลให้ครบ');} if(vehicle==='2W'){const p=integer(parcel);if(p===null)throw new Error('จำนวนส่งสำเร็จไม่ถูกต้อง');result=engine.calculate2W(p,z,sameCount);}else{const sv=integer(s),lv=integer(l);if(sv===null||lv===null)throw new Error('จำนวน Size ไม่ถูกต้อง');result=engine.calculate4W(sv,lv,z,sameCount);} } catch(err){window.cwCurrentCalculation=null;resultFields.error.textContent=err.message;resultFields.total.textContent='0';resultFields.grand.textContent='฿0.00';resultFields.gross.textContent='฿0.00';resultFields.same.textContent='0 ชิ้น';resultFields.deduction.textContent='-฿0.00';resultFields.net.textContent='฿0.00';renderBreakdown([]);checkSave();return;}
+    window.cwCurrentCalculation=result; resultFields.total.textContent=result.parcel.toLocaleString(); resultFields.grand.textContent=money(result.netIncentive); resultFields.gross.textContent=money(result.grossIncentive); resultFields.same.textContent=`${result.sameAddressCount.toLocaleString()} ชิ้น`; resultFields.deduction.textContent=`-${money(result.sameAddressDeduction)}`; resultFields.net.textContent=money(result.netIncentive); renderBreakdown(result.tierBreakdown); checkSave();
+  }
+  function checkSave(){const p=vehicle==='2W'?integer(parcel):(integer(s)||0)+(integer(l)||0);resultFields.save.disabled=!($('calc-date').value&&zone.value&&$('calc-hub').value.trim()&&$('calc-rider').value.trim()&&p>0&&window.cwCurrentCalculation);}
+  function reset(){ $('calculator-form').reset();s.value='0';l.value='0';parcel.value='0';same.value='0';$('calc-date').valueAsDate=new Date();window.cwCurrentCalculation=null;resultFields.error.textContent='';resultFields.total.textContent='0';resultFields.grand.textContent='฿0.00';resultFields.gross.textContent='฿0.00';resultFields.same.textContent='0 ชิ้น';resultFields.deduction.textContent='-฿0.00';resultFields.net.textContent='฿0.00';renderBreakdown([]);checkSave();}
+  function loadProfileIntoForm(){try{const p=JSON.parse(localStorage.getItem('cw_profile')||'{}');if(p.name&&!$('calc-rider').value)$('calc-rider').value=p.name;if(p.hub&&!$('calc-hub').value)$('calc-hub').value=p.hub;}catch{}}
+  document.querySelectorAll('[data-vehicle-tab]').forEach(x=>x.addEventListener('click',()=>setVehicle(x.dataset.vehicleTab)));
+  window.addEventListener('vehicleSelected',e=>setVehicle(e.detail));
+  [zone,s,l,parcel,same,$('calc-date'),$('calc-hub'),$('calc-rider')].forEach(el=>{el?.addEventListener('input',calculate);el?.addEventListener('change',calculate);});
+  $('btn-reset')?.addEventListener('click',reset); initZones(); $('calc-date').valueAsDate=new Date(); loadProfileIntoForm(); setVehicle('4W');
 });

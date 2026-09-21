@@ -1,105 +1,43 @@
-/**
- * =========================================================================
- * Incentive Calculator Pro - Main UI & App Logic
- * =========================================================================
- * จัดการการเปลี่ยนหน้าจอ (Navigation), ระบบ Dark/Light Mode
- * และพฤติกรรม UI ต่างๆ ของผู้ใช้
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // ==========================================
-    // 1. ระบบจัดการธีม (Dark / Light Mode)
-    // ==========================================
-    const htmlElement = document.documentElement;
-    const themeToggles = document.querySelectorAll('.theme-toggle');
-    const themeIcons = document.querySelectorAll('.theme-icon');
-    const themeTexts = document.querySelectorAll('.theme-text');
+  const root = document.documentElement;
+  const profileKey = 'cw_profile';
+  const profile = () => { try { return JSON.parse(localStorage.getItem(profileKey) || '{}'); } catch { return {}; } };
+  const initials = name => String(name || 'CW').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase() || 'CW';
+  const setTheme = theme => { root.dataset.theme = theme; localStorage.setItem('incentive_theme', theme); document.querySelectorAll('.theme-icon').forEach(x=>x.textContent=theme==='dark'?'light_mode':'dark_mode'); };
+  setTheme(localStorage.getItem('incentive_theme') || 'light');
+  document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark')));
 
-    // ตรวจสอบค่าธีมที่เคยบันทึกไว้ หรือดูจากระบบปฏิบัติการ
-    const savedTheme = localStorage.getItem('incentive_theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-        setTheme(savedTheme);
-    } else if (systemDark) {
-        setTheme('dark');
-    }
+  function showView(target) {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.toggle('active', v.id === target));
+    document.querySelectorAll('[data-target]').forEach(n => n.classList.toggle('active', n.dataset.target === target && n.classList.contains('nav-item')));
+    document.querySelector('.app-content').scrollTo({top:0, behavior:'smooth'});
+    if (target === 'view-home') renderHome();
+  }
+  document.querySelectorAll('[data-target]').forEach(link => link.addEventListener('click', e => { e.preventDefault(); if (link.dataset.vehicle) window.dispatchEvent(new CustomEvent('vehicleSelected',{detail:link.dataset.vehicle})); showView(link.dataset.target); }));
+  window.addEventListener('showView', e => showView(e.detail));
 
-    // ผูก Event ให้ปุ่มสลับธีม (มีทั้งบน Sidebar และ Mobile Header)
-    themeToggles.forEach(toggle => {
-        toggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(newTheme);
-        });
-    });
-
-    function setTheme(theme) {
-        htmlElement.setAttribute('data-theme', theme);
-        localStorage.setItem('incentive_theme', theme);
-        
-        // อัปเดตไอคอนและข้อความบนปุ่ม
-        themeIcons.forEach(icon => {
-            icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
-        });
-        
-        themeTexts.forEach(text => {
-            text.textContent = theme === 'dark' ? 'โหมดสว่าง' : 'โหมดกลางคืน';
-        });
-    }
-
-
-    // ==========================================
-    // 2. ระบบนำทาง (Navigation) เปลี่ยนหน้าจอ
-    // ==========================================
-    const navLinks = document.querySelectorAll('.nav-link, .bottom-nav .nav-item');
-    const viewSections = document.querySelectorAll('.view-section');
-
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('data-target');
-
-            // 2.1 ซ่อนทุกหน้าจอ และลบสถานะ Active ออกจากเมนูทั้งหมด
-            viewSections.forEach(section => section.classList.remove('active'));
-            navLinks.forEach(nav => nav.classList.remove('active'));
-
-            // 2.2 แสดงหน้าจอที่เลือก และตั้งสถานะ Active ให้เมนูที่ถูกกด
-            document.getElementById(targetId).classList.add('active');
-            
-            // หาเมนูทั้งหมดที่ชี้ไปยังหน้าจอเดียวกัน (เช่น กดมือถือ แต่อยากให้ Sidebar Active ด้วย)
-            const activeLinks = document.querySelectorAll(`[data-target="${targetId}"]`);
-            activeLinks.forEach(activeNav => activeNav.classList.add('active'));
-
-            // 2.3 เลื่อนหน้าจอกลับไปด้านบนสุดเมื่อเปลี่ยนหน้า
-            document.querySelector('.main-content').scrollTop = 0;
-            
-            // 2.4 ปรับข้อความ Header ของมือถือให้ตรงกับหน้าจอ
-            const mobileHeaderTitle = document.querySelector('.header-title');
-            if (mobileHeaderTitle) {
-                if (targetId === 'view-calculator') mobileHeaderTitle.textContent = 'คำนวณค่ารอบ';
-                else if (targetId === 'view-dashboard') mobileHeaderTitle.textContent = 'ภาพรวมสถิติ';
-                else if (targetId === 'view-history') mobileHeaderTitle.textContent = 'ประวัติย้อนหลัง';
-            }
-        });
-    });
-
-
-    // ==========================================
-    // 3. ปุ่ม FAB (Floating Action Button) บนมือถือ
-    // ==========================================
-    const mobileFab = document.getElementById('mobile-fab');
-    if (mobileFab) {
-        mobileFab.addEventListener('click', () => {
-            // สั่งกดปุ่มเมนู "คำนวณ" (ลัดกลับไปหน้าคำนวณทันที)
-            const calcNav = document.querySelector('.bottom-nav .nav-item[data-target="view-calculator"]');
-            if (calcNav) {
-                calcNav.click();
-                // สั่งโฟกัสไปที่ช่องใส่จำนวน Size S เพื่อให้คีย์บอร์ดเด้งขึ้นมาพร้อมพิมพ์ (UX)
-                setTimeout(() => {
-                    document.getElementById('calc-size-s').focus();
-                }, 300);
-            }
-        });
-    }
+  function renderProfile() {
+    const p = profile(); const name = p.name || 'ยังไม่ได้สร้างโปรไฟล์';
+    const avatar = initials(p.name);
+    const homeGreeting = document.getElementById('home-greeting'); if (homeGreeting) homeGreeting.textContent = p.name ? `สวัสดี, ${p.name}` : 'เริ่มคำนวณรายได้ของคุณ';
+    document.querySelectorAll('#home-avatar,#profile-avatar').forEach(x=>x.textContent=avatar);
+    const preview = document.getElementById('profile-preview-name'); if (preview) preview.textContent=name;
+    [['profile-name','name'],['profile-hub','hub'],['profile-position','position'],['profile-employee','employeeId'],['profile-driver','driverId']].forEach(([id,key])=>{const el=document.getElementById(id); if(el) el.value=p[key]||'';});
+  }
+  function renderHome() {
+    const records = window.CWRecordModel ? window.CWRecordModel.readRecords(localStorage) : [];
+    const today = new Date().toISOString().slice(0,10); const rows = records.filter(r=>r.date===today);
+    const sum = (key) => rows.reduce((a,r)=>a+(Number(r[key])||0),0);
+    const money = n => `฿${n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+    const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+    set('home-net',money(sum('netIncentive'))); set('home-parcel',sum('parcel').toLocaleString()); set('home-same',sum('sameAddressCount').toLocaleString()); set('home-deduction',money(sum('sameAddressDeduction')));
+    const recent=document.getElementById('home-recent'); if(!recent)return;
+    if(!records.length){recent.className='stack-list empty-state';recent.innerHTML='<span class="material-icons-round">receipt_long</span><p>ยังไม่มีรายการบันทึก</p>';return;}
+    recent.className='stack-list'; recent.innerHTML=records.slice(0,3).map(r=>`<div class="record-card"><span class="record-icon material-icons-round">${r.vehicleType==='2W'?'two_wheeler':'local_shipping'}</span><div><strong>${r.vehicleType} · Zone ${r.zone}</strong><small>${r.parcel.toLocaleString()} ส่งสำเร็จ · ${r.date}</small></div><div class="record-money">${money(r.netIncentive)}<small>หัก ${money(r.sameAddressDeduction)}</small></div></div>`).join('');
+  }
+  document.getElementById('profile-save')?.addEventListener('click',()=>{const p={name:document.getElementById('profile-name').value.trim(),hub:document.getElementById('profile-hub').value.trim(),position:document.getElementById('profile-position').value,employeeId:document.getElementById('profile-employee').value.trim(),driverId:document.getElementById('profile-driver').value.trim()};localStorage.setItem(profileKey,JSON.stringify(p));renderProfile();alert('บันทึกโปรไฟล์แล้ว');});
+  document.getElementById('profile-share')?.addEventListener('click',()=>{const url='https://github.com/bangz27/cw-incentive-app/releases/download/v1.0.0/CW-Incentive.apk'; if(navigator.share) navigator.share({title:'CW Incentive',url}); else navigator.clipboard?.writeText(url).then(()=>alert('คัดลอกลิงก์ดาวน์โหลดแล้ว'));});
+  document.getElementById('profile-about')?.addEventListener('click',()=>alert('CW Incentive\nPowered by #BaNGz'));
+  window.addEventListener('historyUpdated', renderHome);
+  renderProfile(); renderHome();
 });
