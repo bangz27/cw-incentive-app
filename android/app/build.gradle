@@ -19,9 +19,9 @@ android {
         applicationId 'com.cw.incentive'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Explicit Phase 2 baseline, not a production upgrade of APK 1.0/code 1.
-        versionCode 1
-        versionName '1.0.0'
+        // v1.1 release metadata; application identity remains unchanged.
+        versionCode 2
+        versionName '1.1.0'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         aaptOptions {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'

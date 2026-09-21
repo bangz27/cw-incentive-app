@@ -6,6 +6,7 @@ const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const json = name => JSON.parse(read(name));
+const packageJson = json('package.json');
 const config = json('capacitor.config.json');
 assert.equal(config.appId, 'com.cw.incentive');
 assert.equal(config.appName, 'CW Incentive');
@@ -19,8 +20,8 @@ assert.deepEqual(config, json('android/app/src/main/assets/capacitor.config.json
 const gradle = read('android/app/build.gradle');
 assert.match(gradle, /applicationId ['"]com\.cw\.incentive['"]/);
 assert.match(gradle, /namespace ['"]com\.cw\.incentive['"]/);
-assert.match(gradle, /versionName ['"]1\.0\.0['"]/);
-assert.match(gradle, /versionCode 1\b/);
+assert.match(gradle, new RegExp(`versionName ['"]${packageJson.version.replaceAll('.', '\\.') }['"]`));
+assert.match(gradle, /versionCode 2\b/);
 assert.match(gradle, /CW_KEYSTORE_PATH/);
 assert.doesNotMatch(gradle, /signingConfig signingConfigs.debug/);
 assert.match(read('android/app/src/main/java/com/cw/incentive/MainActivity.java'), /extends BridgeActivity/);

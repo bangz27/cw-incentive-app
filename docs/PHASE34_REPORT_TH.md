@@ -6,7 +6,7 @@ Phase 3 และ Phase 4 ดำเนินการต่อบน repository 
 
 ## Phase 3 — Android Build
 
-โครงสร้าง Capacitor จาก Phase 2 ถูกใช้ต่อ โดยมีค่า `applicationId=com.cw.incentive`, `versionName=1.0.0`, `versionCode=1`, Capacitor `7.6.9`, compile/target SDK 35 และ Java 21
+โครงสร้าง Capacitor จาก Phase 2 ถูกใช้ต่อ โดยมีค่า `applicationId=com.cw.incentive`, `versionName=1.1.0`, `versionCode=2`, Capacitor `7.6.9`, compile/target SDK 35 และ Java 21
 
 สร้างและตรวจสอบแล้ว:
 
@@ -25,7 +25,7 @@ npm run android:release
 npm run android:aab
 ```
 
-Release APK/AAB ยังไม่ใช่ production release เพราะยังไม่ได้ใช้ production keystore. ไม่ได้แก้หรือลบ Release v1.0.0 ที่มีอยู่ใน GitHub
+Release APK/AAB ของ v1.1 ยังไม่ใช่ production release เพราะยังไม่ได้ใช้ production keystore. Release v1.0.0 เดิมใน GitHub ยังคงอยู่
 
 ## Phase 4 — UI Redesign
 
