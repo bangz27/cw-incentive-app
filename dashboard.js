@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ฟังก์ชันหลักสำหรับอัปเดตหน้า Dashboard ทั้งหมด
     function updateDashboard() {
-        const history = JSON.parse(localStorage.getItem('incentive_history')) || [];
-        
+        const history = window.CWRecordModel ? window.CWRecordModel.readRecords(localStorage) : [];
+
         updateSummaryCards(history);
         updateCharts(history);
     }
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         history.forEach(item => {
             const itemDate = new Date(item.date);
-            const amount = parseFloat(item.grandTotal) || 0;
+            const amount = parseFloat(item.grossIncentive) || 0;
 
             // ยอดรวมทั้งหมด
             allTimeTotal += amount;
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         history.forEach(item => {
             // รวมยอดเงินตามวันที่
             if (!dailyData[item.date]) dailyData[item.date] = 0;
-            dailyData[item.date] += parseFloat(item.grandTotal);
+            dailyData[item.date] += parseFloat(item.grossIncentive) || 0;
         });
 
         // เรียงวันที่จากเก่าไปใหม่ และเลือกแค่ 7 วันล่าสุด
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const zoneData = {};
         history.forEach(item => {
             if (!zoneData[item.zone]) zoneData[item.zone] = 0;
-            zoneData[item.zone] += parseFloat(item.grandTotal);
+            zoneData[item.zone] += parseFloat(item.grossIncentive) || 0;
         });
 
         const zoneLabels = Object.keys(zoneData);

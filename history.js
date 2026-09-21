@@ -1,9 +1,9 @@
 /**
  * =========================================================================
- * Incentive Calculator Pro - History & Storage Logic
+ * Incentive Calculator Pro - History & Storage Adapter
  * =========================================================================
- * จัดการการบันทึกข้อมูลลง LocalStorage, แสดงผลประวัติ, 
- * และเตรียมการส่งข้อมูล (Sync) ขึ้น Google Sheets
+ * Stores unified records in LocalStorage and normalizes legacy records on read
+ * without deleting or mutating the existing stored data.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,72 +11,58 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyBody = document.getElementById('history-body');
     const btnSync = document.getElementById('btn-sync-history');
 
-    // 1. โหลดประวัติขึ้นมาแสดงทันทีเมื่อเปิดแอป
     loadHistory();
 
-    // 2. ดักจับเหตุการณ์เมื่อผู้ใช้กดปุ่ม "บันทึก" ในหน้าคำนวณ
     if (btnSave) {
         btnSave.addEventListener('click', () => {
             const date = document.getElementById('calc-date').value;
             const zone = document.getElementById('calc-zone').value;
             const hub = document.getElementById('calc-hub').value.trim();
             const rider = document.getElementById('calc-rider').value.trim();
-            const sizeS = parseInt(document.getElementById('calc-size-s').value) || 0;
-            const sizeL = parseInt(document.getElementById('calc-size-l').value) || 0;
-            const totalParcels = sizeS + sizeL;
-            
-            // ดึงตัวเลขยอดเงินสุทธิจาก UI (ลบตัวอักษร ฿ และลูกน้ำออกเพื่อแปลงเป็นตัวเลข)
-            const grandTotalText = document.getElementById('res-grand-total').textContent;
-            const grandTotal = parseFloat(grandTotalText.replace(/[^0-9.-]+/g,"")) || 0;
+            const result = window.cwCurrentCalculation;
 
-            // สร้าง Object ข้อมูลเตรียมบันทึก
-            const record = {
-                id: Date.now(), // ใช้ Timestamp เป็น ID ไม่ซ้ำกัน
-                timestamp: new Date().toISOString(),
-                date: date,
-                zone: zone,
-                hub: hub,
-                rider: rider,
-                sizeS: sizeS,
-                sizeL: sizeL,
-                totalParcels: totalParcels,
-                grandTotal: grandTotal,
-                synced: false // สถานะการส่งขึ้น Google Sheets
-            };
+            if (!result || !window.CWRecordModel) {
+                alert('กรุณากรอกข้อมูลและคำนวณค่ารอบก่อนบันทึก');
+                return;
+            }
 
-            // บันทึกลง LocalStorage
+            const record = window.CWRecordModel.createRecord({
+                id: Date.now(),
+                date,
+                fullName: rider,
+                hub,
+                driverId: '',
+                result,
+                createdAt: new Date().toISOString()
+            });
+            record.synced = false;
+
             saveRecord(record);
 
-            // เอฟเฟกต์ปุ่มตอบสนองว่าบันทึกสำเร็จ
             const originalText = btnSave.innerHTML;
             btnSave.innerHTML = '<span class="material-icons-round fs-5 align-middle">check_circle</span> บันทึกสำเร็จ!';
             btnSave.classList.replace('btn-primary', 'btn-success');
-            
-            // หน่วงเวลา 1.5 วินาที ค่อยคืนค่าปุ่มและล้างฟอร์ม
+
             setTimeout(() => {
                 btnSave.innerHTML = originalText;
                 btnSave.classList.replace('btn-success', 'btn-primary');
-                document.getElementById('btn-reset').click(); // สั่งกดปุ่มรีเซ็ตเพื่อล้างฟอร์ม
+                document.getElementById('btn-reset').click();
             }, 1500);
         });
     }
 
-    // ฟังก์ชันบันทึกข้อมูลลง LocalStorage
     function saveRecord(record) {
-        let history = JSON.parse(localStorage.getItem('incentive_history')) || [];
-        history.unshift(record); // ดันข้อมูลใหม่ให้อยู่แถวบนสุด (Index 0)
+        const history = window.CWRecordModel.readRawRecords(localStorage);
+        history.unshift(record);
         localStorage.setItem('incentive_history', JSON.stringify(history));
-        
-        loadHistory(); // รีเฟรชตารางประวัติ
-        
-        // ส่ง Event ไปบอกหน้า Dashboard ให้อัปเดตกราฟและตัวเลข
+        loadHistory();
         window.dispatchEvent(new Event('historyUpdated'));
     }
 
-    // ฟังก์ชันโหลดข้อมูลมาสร้างตาราง HTML
     function loadHistory() {
-        const history = JSON.parse(localStorage.getItem('incentive_history')) || [];
-        
+        if (!historyBody || !window.CWRecordModel) return;
+        const history = window.CWRecordModel.readRecords(localStorage);
+
         if (history.length === 0) {
             historyBody.innerHTML = `
                 <tr>
@@ -91,15 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = '';
         history.forEach(item => {
-            // ปรับฟอร์แมตวันที่ให้สวยงาม (เช่น 13 ก.ค. 2569)
             const dateObj = new Date(item.date);
-            const formattedDate = dateObj.toLocaleDateString('th-TH', { 
-                year: 'numeric', month: 'short', day: 'numeric' 
+            const formattedDate = dateObj.toLocaleDateString('th-TH', {
+                year: 'numeric', month: 'short', day: 'numeric'
             });
 
-            // ไอคอนสถานะ Sync
-            const syncIcon = item.synced 
-                ? '<span class="material-icons-round text-success align-middle fs-6 ms-1" title="ซิงค์แล้ว">cloud_done</span>' 
+            const syncIcon = item.synced
+                ? '<span class="material-icons-round text-success align-middle fs-6 ms-1" title="ซิงค์แล้ว">cloud_done</span>'
                 : '<span class="material-icons-round text-warning align-middle fs-6 ms-1" title="รอซิงค์">cloud_queue</span>';
 
             html += `
@@ -107,11 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="text-nowrap">${formattedDate} ${syncIcon}</td>
                     <td><span class="badge bg-secondary bg-opacity-25 text-dark">${item.zone}</span></td>
                     <td>${item.hub}</td>
-                    <td>${item.rider}</td>
+                    <td>${item.fullName}</td>
                     <td class="text-center text-primary fw-medium">${item.sizeS}</td>
                     <td class="text-center text-warning fw-medium">${item.sizeL}</td>
-                    <td class="text-center fw-bold">${item.totalParcels}</td>
-                    <td class="text-end fw-bold text-success">฿${item.grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="text-center fw-bold">${item.parcel}</td>
+                    <td class="text-end fw-bold text-success">฿${item.netIncentive.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 </tr>
             `;
         });
@@ -119,10 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
         historyBody.innerHTML = html;
     }
 
-    // 3. ระบบ Sync ข้อมูลไป Google Apps Script (ทำงานเมื่อกดปุ่ม ดึงข้อมูล)
     if (btnSync) {
         btnSync.addEventListener('click', async () => {
-            const history = JSON.parse(localStorage.getItem('incentive_history')) || [];
+            const rawHistory = window.CWRecordModel.readRawRecords(localStorage);
+            const history = rawHistory.map(window.CWRecordModel.toUnifiedRecord);
             const unsyncedRecords = history.filter(item => !item.synced);
 
             if (unsyncedRecords.length === 0) {
@@ -131,41 +115,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (!APP_CONFIG.GOOGLE_SCRIPT_URL) {
-                alert("ระบบยังไม่พร้อมใช้งาน: กรุณาตั้งค่า GOOGLE_SCRIPT_URL ในไฟล์ config.js ก่อนเพื่อใช้งานฟีเจอร์นี้");
+                alert('ระบบยังไม่พร้อมใช้งาน: กรุณาตั้งค่า GOOGLE_SCRIPT_URL ในไฟล์ config.js ก่อนเพื่อใช้งานฟีเจอร์นี้');
                 return;
             }
 
-            // เปลี่ยนปุ่มเป็นสถานะกำลังโหลด
             const originalHtml = btnSync.innerHTML;
             btnSync.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> กำลังซิงค์...';
             btnSync.disabled = true;
 
             try {
-                // จำลองการส่ง HTTP POST ไปยัง Google Apps Script
-                const response = await fetch(APP_CONFIG.GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // เลี่ยงปัญหา CORS Block จาก Browser
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        action: 'saveHistory', 
-                        data: unsyncedRecords 
-                    })
+                const rawById = new Map(rawHistory.map(item => [item.id, item]));
+                const syncPayload = unsyncedRecords.map(item => {
+                    const raw = rawById.get(item.id);
+                    return raw && Object.prototype.hasOwnProperty.call(raw, 'grandTotal') ? raw : item;
                 });
 
-                // อัปเดตสถานะของข้อมูลทั้งหมดใน LocalStorage ให้เป็น "ซิงค์แล้ว"
-                const updatedHistory = history.map(item => ({ ...item, synced: true }));
-                localStorage.setItem('incentive_history', JSON.stringify(updatedHistory));
-                
-                loadHistory(); // โหลดตารางใหม่ (เปลี่ยนไอคอนเป็นติ๊กถูก)
-                alert(`ซิงค์ข้อมูลขึ้น Google Sheets สำเร็จจำนวน ${unsyncedRecords.length} รายการ`);
+                await fetch(APP_CONFIG.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveHistory', data: syncPayload })
+                });
 
+                const unsyncedIds = new Set(unsyncedRecords.map(item => item.id));
+                const updatedRawHistory = rawHistory.map(item => (
+                    unsyncedIds.has(item.id) ? { ...item, synced: true } : item
+                ));
+                localStorage.setItem('incentive_history', JSON.stringify(updatedRawHistory));
+
+                loadHistory();
+                alert(`ซิงค์ข้อมูลขึ้น Google Sheets สำเร็จจำนวน ${unsyncedRecords.length} รายการ`);
             } catch (error) {
-                console.error("Sync Error:", error);
-                alert("การซิงค์ล้มเหลว โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+                console.error('Sync Error:', error);
+                alert('การซิงค์ล้มเหลว โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
             } finally {
-                // คืนค่าปุ่มกลับเหมือนเดิม
                 btnSync.innerHTML = originalHtml;
                 btnSync.disabled = false;
             }
