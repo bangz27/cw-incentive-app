@@ -1,0 +1,310 @@
+/* ==========================================================================
+   CSS Variables & Theming (SPX Orange Theme)
+   ========================================================================== */
+:root[data-theme="light"] {
+    --primary-color: #EE4D2D; /* SPX Orange */
+    --primary-hover: #D73F21;
+    --primary-light: rgba(238, 77, 45, 0.1);
+    
+    --success-color: #2E7D32; /* Green for money/success */
+    --success-light: rgba(46, 125, 50, 0.1);
+    
+    --bg-main: #f4f6f9;
+    --bg-surface: #ffffff;
+    --bg-glass: rgba(255, 255, 255, 0.85);
+    
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: rgba(0, 0, 0, 0.08);
+    
+    --sidebar-bg: #ffffff;
+    --nav-active-bg: var(--primary-light);
+    --nav-active-text: var(--primary-color);
+}
+
+:root[data-theme="dark"] {
+    --primary-color: #FF5722; /* Slightly brighter orange for dark mode visibility */
+    --primary-hover: #E64A19;
+    --primary-light: rgba(255, 87, 34, 0.15);
+    
+    --success-color: #4CAF50;
+    --success-light: rgba(76, 175, 80, 0.15);
+    
+    --bg-main: #121212;
+    --bg-surface: #1e1e1e;
+    --bg-glass: rgba(30, 30, 30, 0.85);
+    
+    --text-primary: #e0e0e0;
+    --text-secondary: #9e9e9e;
+    --border-color: rgba(255, 255, 255, 0.08);
+    
+    --sidebar-bg: #1e1e1e;
+    --nav-active-bg: var(--primary-light);
+    --nav-active-text: var(--primary-color);
+}
+
+/* ==========================================================================
+   Global Styles
+   ========================================================================== */
+body {
+    font-family: 'Sarabun', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+/* Typography & Utilities */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+}
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+.text-primary { color: var(--primary-color) !important; }
+.text-success { color: var(--success-color) !important; }
+
+/* Override Bootstrap Colors */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.bg-success.bg-opacity-10 {
+    background-color: var(--success-light) !important;
+}
+
+/* Inputs */
+.form-control, .form-select {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+}
+.form-control:focus, .form-select:focus {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem var(--primary-light);
+}
+
+/* ==========================================================================
+   App Layout & Components
+   ========================================================================== */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar (Desktop) */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+}
+.sidebar-brand {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.sidebar-brand .text-success {
+    color: var(--primary-color) !important; /* Brand icon uses SPX Orange */
+}
+.sidebar .nav-link {
+    color: var(--text-primary);
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-radius: 0 25px 25px 0;
+    margin-right: 1rem;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.sidebar .nav-link:hover {
+    background-color: var(--bg-main);
+}
+.sidebar .nav-link.active {
+    background-color: var(--nav-active-bg);
+    color: var(--nav-active-text);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 260px; /* Offset for desktop sidebar */
+    padding-bottom: 80px; /* Offset for mobile bottom nav */
+    transition: margin-left 0.3s ease;
+}
+@media (max-width: 767.98px) {
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* Mobile Sticky Header */
+.sticky-header {
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    border-bottom: 1px solid var(--border-color);
+}
+.sticky-header .text-success {
+    color: var(--primary-color) !important;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color) !important;
+    border-radius: 1rem;
+}
+.glass-card .card-body {
+    color: var(--text-primary);
+}
+
+/* View Sections (SPA switching) */
+.view-section {
+    display: none;
+    animation: fadeIn 0.4s ease forwards;
+}
+.view-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tables */
+.table {
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+.table-light {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+}
+.table-hover tbody tr:hover {
+    background-color: var(--primary-light);
+    color: var(--text-primary);
+}
+:root[data-theme="dark"] .table-light {
+    background-color: rgba(255,255,255,0.05);
+}
+:root[data-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-primary);
+}
+
+/* Stat Box (Calculator Result) */
+.stat-box {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   Mobile Bottom Navigation & FAB
+   ========================================================================== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--sidebar-bg);
+    border-top: 1px solid var(--border-color);
+    z-index: 1000;
+    padding: 0.5rem 0;
+    justify-content: space-around;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)); /* iOS safe area */
+}
+.bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    gap: 4px;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+.bottom-nav .nav-item.active {
+    color: var(--primary-color);
+    background-color: var(--primary-light);
+}
+
+/* Floating Action Button (Mobile) */
+.fab {
+    position: fixed;
+    bottom: 80px; /* Above bottom nav */
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    transition: transform 0.2s;
+}
+.fab:active {
+    transform: scale(0.9);
+}
+
+/* Print Styles for Export */
+@media print {
+    .sidebar, .bottom-nav, .fab, .sticky-header, #btn-reset, #btn-save, .theme-toggle {
+        display: none !important;
+    }
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+    }
+    .glass-card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
