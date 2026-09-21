@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const homeGreeting = document.getElementById('home-greeting'); if (homeGreeting) homeGreeting.textContent = p.name ? `สวัสดี, ${p.name}` : 'เริ่มคำนวณรายได้ของคุณ';
     document.querySelectorAll('#home-avatar,#profile-avatar,#calculator-avatar').forEach(x=>setAvatar(x,p));
     const calculatorName=document.getElementById('calculator-profile-name'); if(calculatorName) calculatorName.textContent=p.name||'โปรไฟล์ปัจจุบัน';
+    const missing=document.getElementById('calculator-profile-missing'); if(missing) missing.classList.toggle('hidden',Boolean(p.name&&p.hub));
+    const calcName=document.getElementById('calc-rider'); if(calcName) calcName.value=p.name||'';
+    const calcHub=document.getElementById('calc-hub'); if(calcHub) calcHub.value=p.hub||'';
     const preview = document.getElementById('profile-preview-name'); if (preview) preview.textContent=name;
     [['profile-name','name'],['profile-hub','hub'],['profile-position','position'],['profile-employee','employeeId'],['profile-driver','driverId']].forEach(([id,key])=>{const el=document.getElementById(id); if(el) el.value=p[key]||'';});
   }
@@ -38,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!records.length){recent.className='stack-list empty-state';recent.innerHTML='<span class="material-icons-round">receipt_long</span><p>ยังไม่มีรายการบันทึก</p>';return;}
     recent.className='stack-list'; recent.innerHTML=records.slice(0,3).map(r=>`<div class="record-card"><span class="record-icon material-icons-round">${r.vehicleType==='2W'?'two_wheeler':'local_shipping'}</span><div><strong>${r.vehicleType} · Zone ${r.zone}</strong><small>${r.parcel.toLocaleString()} ส่งสำเร็จ · ${r.date}</small></div><div class="record-money">${money(r.netIncentive)}<small>หัก ${money(r.sameAddressDeduction)}</small></div></div>`).join('');
   }
-  document.getElementById('profile-save')?.addEventListener('click',()=>{const old=profile();const p={name:document.getElementById('profile-name').value.trim(),hub:document.getElementById('profile-hub').value.trim(),position:document.getElementById('profile-position').value,employeeId:document.getElementById('profile-employee').value.trim(),driverId:document.getElementById('profile-driver').value.trim(),photo:old.photo||''};localStorage.setItem(profileKey,JSON.stringify(p));renderProfile();alert('บันทึกโปรไฟล์แล้ว');});
+  document.getElementById('profile-save')?.addEventListener('click',()=>{const old=profile();const p={name:document.getElementById('profile-name').value.trim(),hub:document.getElementById('profile-hub').value.trim(),position:document.getElementById('profile-position').value,employeeId:document.getElementById('profile-employee').value.trim(),driverId:document.getElementById('profile-driver').value.trim(),photo:old.photo||''};localStorage.setItem(profileKey,JSON.stringify(p));renderProfile();window.dispatchEvent(new Event('activeProfileChanged'));alert('บันทึกโปรไฟล์แล้ว');});
   const photoInput=document.getElementById('profile-photo-input');
   const choosePhoto=()=>photoInput?.click();
   document.getElementById('profile-avatar-button')?.addEventListener('click',choosePhoto);
@@ -46,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   photoInput?.addEventListener('change',async()=>{const file=photoInput.files?.[0];if(!file)return;try{const p=profile();p.photo=await resizePhoto(file);localStorage.setItem(profileKey,JSON.stringify(p));renderProfile();}catch(error){alert(error.message);}finally{photoInput.value='';}});
   document.getElementById('profile-photo-remove')?.addEventListener('click',()=>{const p=profile();delete p.photo;localStorage.setItem(profileKey,JSON.stringify(p));renderProfile();});
   document.getElementById('google-login-button')?.addEventListener('click',()=>alert('Google Login ยังไม่เปิดใช้งาน\nฟีเจอร์นี้เป็นโครงสร้างเตรียมไว้สำหรับการเชื่อมต่อภายหลัง'));
+  document.getElementById('calculator-create-profile')?.addEventListener('click',()=>showView('view-profile'));
   document.getElementById('profile-share')?.addEventListener('click',()=>{const url='https://github.com/bangz27/cw-incentive-app/releases/download/v1.1/CW-Incentive.apk'; if(navigator.share) navigator.share({title:'CW Incentive v1.1',url}); else navigator.clipboard?.writeText(url).then(()=>alert('คัดลอกลิงก์ดาวน์โหลดแล้ว'));});
   document.getElementById('profile-about')?.addEventListener('click',()=>alert('CW Incentive\nPowered by #BaNGz'));
   window.addEventListener('historyUpdated', renderHome);
