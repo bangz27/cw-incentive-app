@@ -1,0 +1,28 @@
+# Reproducible generated output
+node_modules/
+www/
+.android/
+.gradle/
+**/build/
+*.apk
+*.aab
+*.apks
+
+# Local machine / signing only
+local.properties
+**/local.properties
+.env
+.env.*
+*.jks
+*.keystore
+keystore.properties
+key.properties
+.idea/
+.DS_Store
+
+# Capacitor sync output (regenerate using npm run cap:sync)
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+android/app/src/main/res/xml/config.xml
+android/capacitor-cordova-android-plugins/

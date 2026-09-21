@@ -1,0 +1,26 @@
+{
+  "name": "cw-incentive-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CW Incentive existing web baseline packaged for Android (Phase 2)",
+  "engines": { "node": ">=22 <23", "npm": ">=10 <11" },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check:syntax": "node scripts/check-syntax.cjs",
+    "check:baseline": "node scripts/verify-baseline.cjs",
+    "build:web": "node scripts/build-web.cjs",
+    "cap:sync": "npm run build:web && cap sync android",
+    "android:debug": "npm run cap:sync && node scripts/gradle.cjs assembleDebug",
+    "android:release": "npm run cap:sync && node scripts/gradle.cjs assembleRelease",
+    "android:aab": "npm run cap:sync && node scripts/gradle.cjs bundleRelease",
+    "android:open": "cap open android",
+    "verify:platform": "node validation/platform-check.cjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.6.9",
+    "@capacitor/core": "7.6.9"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.6.9"
+  }
+}

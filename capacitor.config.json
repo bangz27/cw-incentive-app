@@ -1,0 +1,14 @@
+{
+  "appId": "com.cw.incentive",
+  "appName": "CW Incentive",
+  "webDir": "www",
+  "loggingBehavior": "debug",
+  "server": {
+    "hostname": "localhost",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
