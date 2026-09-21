@@ -22,4 +22,4 @@
 
 ## หมายเหตุ
 
-ไฟล์ Release APK/AAB ที่แนบใน release นี้เป็น unsigned build เนื่องจากยังไม่ได้ตั้งค่า production keystore สำหรับการเผยแพร่ผ่าน Google Play
+ไฟล์ Release APK/AAB ที่แนบใน release นี้เซ็นด้วย CW Incentive release keystore และตรวจสอบด้วย `apksigner verify` แล้ว จึงสามารถติดตั้ง APK ได้. สำหรับการเผยแพร่ผ่าน Google Play ควรใช้ production signing policy/keystore ของเจ้าของแอป

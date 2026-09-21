@@ -25,7 +25,7 @@ npm run android:release
 npm run android:aab
 ```
 
-Release APK/AAB ของ v1.1 ยังไม่ใช่ production release เพราะยังไม่ได้ใช้ production keystore. Release v1.0.0 เดิมใน GitHub ยังคงอยู่
+Release APK/AAB ของ v1.1 เซ็นด้วย CW Incentive release keystore และติดตั้งได้แล้ว ส่วนการเผยแพร่ผ่าน Google Play ยังต้องใช้ production signing policy/keystore ของเจ้าของแอป. Release v1.0.0 เดิมใน GitHub ยังคงอยู่
 
 ## Phase 4 — UI Redesign
 
