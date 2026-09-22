@@ -1,4 +1,40 @@
-document.addEventListener('DOMContentLoaded', () => {
+from pathlib import Path
+
+root = Path(__file__).resolve().parents[1]
+index = root / 'index.html'
+css = root / 'style.css'
+app = root / 'app.js'
+
+html = index.read_text()
+html = html.replace(
+    '<div class="home-period card"><div><span class="material-icons-round">calendar_month</span><div><small>รอบวันที่</small><b>01 ก.ย. 2568 - 30 ก.ย. 2568</b></div></div><button type="button" class="text-button nav-link" data-target="view-summary"><span class="material-icons-round">calendar_month</span>เลือกช่วงวันที่ <span class="material-icons-round">chevron_right</span></button></div>',
+    '''<div class="home-period card" id="home-period-card">
+        <div class="home-period-main"><span class="material-icons-round">calendar_month</span><div><small>รอบวันที่</small><b id="home-date-range">เลือกช่วงวันที่</b></div></div>
+        <button type="button" class="text-button" id="home-date-picker"><span class="material-icons-round">calendar_month</span>เลือกช่วงวันที่ <span class="material-icons-round">chevron_right</span></button>
+        <div class="date-range-editor hidden" id="date-range-editor" aria-label="เลือกช่วงวันที่">
+          <label class="field"><span>วันที่เริ่มต้น</span><input type="date" id="range-from"></label>
+          <label class="field"><span>วันที่สิ้นสุด</span><input type="date" id="range-to"></label>
+          <div class="date-range-actions"><button type="button" class="text-button" id="range-cancel">ยกเลิก</button><button type="button" class="primary-button" id="range-apply">ใช้ช่วงวันที่</button></div>
+        </div>
+      </div>''')
+html = html.replace('<button class="text-button nav-link" data-target="view-dashboard">ดูภาพรวม</button>', '')
+start = html.find('    <section id="view-dashboard"')
+if start >= 0:
+    end = html.find('    <section id="view-profile"', start)
+    html = html[:start] + html[end:]
+# Add a simple guide view before support.
+guide = '''    <section id="view-guide" class="view-section settings-view">
+      <div class="page-heading"><button class="icon-button" id="guide-back" aria-label="ย้อนกลับ"><span class="material-icons-round">arrow_back</span></button><div><span class="eyebrow">คู่มือ</span><h1>คู่มือการทำจ่าย</h1></div><span class="material-icons-round page-icon">menu_book</span></div>
+      <div class="segmented-control" role="tablist"><button class="segment active" data-guide-vehicle="2W">2W</button><button class="segment" data-guide-vehicle="4W">4W</button></div>
+      <div class="segmented-control" role="tablist"><button class="segment active" data-guide-half="1H">1H</button><button class="segment" data-guide-half="2H">2H</button></div>
+      <div class="card guide-detail" id="guide-detail"><h2>รายละเอียดการทำจ่าย</h2><p class="muted">เลือกประเภทรถและรอบครึ่งเดือนเพื่อดูรายละเอียดตาม Configuration เดิมของระบบ</p></div>
+    </section>
+'''
+html = html.replace('    <section id="view-support"', guide + '    <section id="view-support"')
+index.write_text(html)
+
+# Replace app controller with a version that preserves profile behavior and adds date-range aggregation.
+app.write_text(r'''document.addEventListener('DOMContentLoaded', () => {
   const root = document.documentElement;
   const profiles = window.TBSProfiles;
   const initials = name => String(name || 'TB').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase() || 'TB';
@@ -51,3 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.banner-close').forEach(button => button.addEventListener('click', () => button.closest('.profile-autofill-banner,.rts-help')?.classList.add('is-hidden'))); document.getElementById('google-login-button')?.addEventListener('click', () => alert('Google Login ยังรอการตั้งค่า Firebase ของเจ้าของแอป')); document.getElementById('profile-google-card')?.addEventListener('click', () => alert('Google Login ยังรอการตั้งค่า Firebase ของเจ้าของแอป')); document.getElementById('calculator-create-profile')?.addEventListener('click', () => showView('view-profile'));
   window.addEventListener('activeProfileChanged', renderProfile); window.addEventListener('historyUpdated', renderHome); renderProfile(); renderHome();
 });
+''')
+
+css.write_text(css.read_text() + '''\n/* V1.2 targeted UI fixes */\n.home-period{position:relative}.home-period-main{display:flex;align-items:center;gap:10px}.home-period-main>.material-icons-round{color:var(--orange);font-size:25px}.home-period-main b{display:block}.date-range-editor{display:grid;gap:10px;border-top:1px solid var(--border);margin-top:14px;padding-top:14px}.date-range-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px}.date-range-actions .primary-button{width:auto;min-height:42px}.date-range-editor .field input{height:44px}.page-heading h1{white-space:nowrap}.profile-autofill-banner{padding:8px 10px;margin-top:4px}.profile-autofill-banner>.material-icons-round{font-size:22px}.rts-help{padding:8px 10px}.bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:0;padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}.nav-item{width:100%;min-width:0}.nav-item span:last-child{white-space:nowrap}.guide-detail{line-height:1.7}.guide-detail p{margin-top:8px}@media(max-width:380px){.page-heading h1{font-size:23px}.home-period{padding:14px}.home-period>#home-date-picker{font-size:12px}.nav-item{font-size:10px}.nav-item .material-icons-round{font-size:21px}}\n''')
+print('Applied V1.2 targeted changes')

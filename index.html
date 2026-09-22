@@ -27,12 +27,20 @@
   <main class="app-content">
     <section id="view-home" class="view-section active home-view">
       <div class="greeting-row"><div><span class="eyebrow">TBS Incentive</span><h1 id="home-greeting">สวัสดีครับ</h1><small class="home-tagline">Drive · Deliver · Grow Together</small></div><span class="avatar" id="home-avatar">TB</span></div>
-      <div class="home-period card"><div><span class="material-icons-round">calendar_month</span><div><small>รอบวันที่</small><b>01 ก.ย. 2568 - 30 ก.ย. 2568</b></div></div><button type="button" class="text-button nav-link" data-target="view-summary"><span class="material-icons-round">calendar_month</span>เลือกช่วงวันที่ <span class="material-icons-round">chevron_right</span></button></div>
+      <div class="home-period card" id="home-period-card">
+        <div class="home-period-main"><span class="material-icons-round">calendar_month</span><div><small>รอบวันที่</small><b id="home-date-range">เลือกช่วงวันที่</b></div></div>
+        <button type="button" class="text-button" id="home-date-picker"><span class="material-icons-round">calendar_month</span>เลือกช่วงวันที่ <span class="material-icons-round">chevron_right</span></button>
+        <div class="date-range-editor hidden" id="date-range-editor" aria-label="เลือกช่วงวันที่">
+          <label class="field"><span>วันที่เริ่มต้น</span><input type="date" id="range-from"></label>
+          <label class="field"><span>วันที่สิ้นสุด</span><input type="date" id="range-to"></label>
+          <div class="date-range-actions"><button type="button" class="text-button" id="range-cancel">ยกเลิก</button><button type="button" class="primary-button" id="range-apply">ใช้ช่วงวันที่</button></div>
+        </div>
+      </div>
       <div class="hero-card home-total"><div><span class="eyebrow light">ยอดรวมของวันที่</span><strong id="home-net">฿0.00</strong><small class="hero-currency">บาท</small></div><span class="material-icons-round hero-icon">account_balance_wallet</span></div>
       <div class="home-summary-card"><h2><span class="material-icons-round">assignment_turned_in</span>สรุปผลการทำงาน</h2><button class="home-summary-row nav-link" data-target="view-history"><span class="summary-row-icon peach"><span class="material-icons-round">inventory_2</span></span><span><b>รวมส่งสำเร็จ</b><small>จำนวนพัสดุที่ส่งถึงผู้รับ</small></span><strong><span id="home-parcel">0</span> ชิ้น</strong><span class="material-icons-round">chevron_right</span></button><button class="home-summary-row nav-link" data-target="view-history"><span class="summary-row-icon pink"><span class="material-icons-round">undo</span></span><span><b>งาน RTS</b><small>จำนวนพัสดุงานส่งคืน</small></span><strong><span id="home-rts">0</span> บาท</strong><span class="material-icons-round">chevron_right</span></button><button class="home-summary-row nav-link" data-target="view-summary"><span class="summary-row-icon yellow"><span class="material-icons-round">payments</span></span><span><b>รวมหักเงิน</b><small>รายการหักตามเงื่อนไข</small></span><strong class="warning-text"><span id="home-deduction">฿0.00</span></strong><span class="material-icons-round">chevron_right</span></button></div>
       <div class="home-note"><span class="material-icons-round">info</span><p>*ข้อมูลนี้ยังไม่รวมเงินเข้างาน 1,000฿<br>รางวัลการโทร 500฿<br>เงินค่าปรับจากรูปถ่ายปิดงาน<br>Application ยังไม่สามารถคำนวณ 4W Own Fleet</p></div>
       <div class="home-quote"><b>Deliver a Better Tomorrow</b><small>ทุกการส่งของ คือโอกาสที่ดีกว่า</small></div>
-      <div class="home-quick"><div class="section-heading"><h2>เลือกประเภทรถ</h2><button class="text-button nav-link" data-target="view-dashboard">ดูภาพรวม</button></div><div class="vehicle-grid"><button class="vehicle-card nav-link" data-target="view-calculator" data-vehicle="2W"><span class="vehicle-icon material-icons-round">two_wheeler</span><strong>2W</strong><small>รถจักรยานยนต์</small></button><button class="vehicle-card nav-link" data-target="view-calculator" data-vehicle="4W"><span class="vehicle-icon material-icons-round">local_shipping</span><strong>4W</strong><small>รถยนต์ส่งของ</small></button></div></div>
+      <div class="home-quick"><div class="section-heading"><h2>เลือกประเภทรถ</h2></div><div class="vehicle-grid"><button class="vehicle-card nav-link" data-target="view-calculator" data-vehicle="2W"><span class="vehicle-icon material-icons-round">two_wheeler</span><strong>2W</strong><small>รถจักรยานยนต์</small></button><button class="vehicle-card nav-link" data-target="view-calculator" data-vehicle="4W"><span class="vehicle-icon material-icons-round">local_shipping</span><strong>4W</strong><small>รถยนต์ส่งของ</small></button></div></div>
       <div class="section-heading"><h2>รายการล่าสุด</h2><button class="text-button nav-link" data-target="view-history">ดูทั้งหมด</button></div><div id="home-recent" class="stack-list empty-state"><span class="material-icons-round">receipt_long</span><p>ยังไม่มีรายการบันทึก</p></div>
     </section>
 
@@ -59,11 +67,6 @@
       <div id="history-body" class="stack-list empty-state"><span class="material-icons-round">inbox</span><p>ยังไม่มีรายการบันทึก</p></div>
     </section>
 
-    <section id="view-dashboard" class="view-section">
-      <div class="page-heading"><div><span class="eyebrow">ภาพรวม</span><h1>Dashboard</h1></div><span class="material-icons-round page-icon">bar_chart</span></div>
-      <div class="summary-grid"><div class="summary-card"><span class="material-icons-round">today</span><strong id="dash-today">฿0</strong><small>วันนี้</small></div><div class="summary-card"><span class="material-icons-round">calendar_month</span><strong id="dash-monthly">฿0</strong><small>เดือนนี้</small></div><div class="summary-card"><span class="material-icons-round">receipt_long</span><strong id="dash-count">0</strong><small>จำนวนรายการ</small></div><div class="summary-card"><span class="material-icons-round">query_stats</span><strong id="dash-average">฿0</strong><small>เฉลี่ยต่อวัน</small></div></div>
-      <div class="card chart-card"><h2>รายได้ตามวัน</h2><div class="chart-slot"><canvas id="trendChart"></canvas></div></div><div class="card chart-card"><h2>สัดส่วนตามโซน</h2><div class="chart-slot"><canvas id="zoneChart"></canvas></div></div>
-    </section>
     <section id="view-profile" class="view-section">
       <div class="page-heading"><div><span class="eyebrow">โปรไฟล์</span><h1>ข้อมูลของฉัน</h1></div><button class="icon-button theme-toggle"><span class="material-icons-round theme-icon">dark_mode</span></button></div>
       <div class="card profile-card"><button type="button" class="profile-photo-button" id="profile-avatar-button" aria-label="เลือกรูปโปรไฟล์"><span class="profile-avatar" id="profile-avatar">CW</span><span class="photo-camera material-icons-round">photo_camera</span></button><input type="file" id="profile-photo-input" accept="image/jpeg,image/png" hidden><div class="photo-actions"><button type="button" class="text-button" id="profile-photo-change">เปลี่ยนรูป</button><button type="button" class="text-button danger-button" id="profile-photo-remove">ลบรูป</button></div><h2 id="profile-preview-name">ยังไม่ได้สร้างโปรไฟล์</h2><p class="muted">รูปจะถูกบีบอัดและเก็บไว้ในเครื่องกับโปรไฟล์ปัจจุบัน</p></div>
@@ -78,6 +81,12 @@
       <div class="settings-footer"><span class="material-icons-round">local_shipping</span><b>TBS Incentive</b><small>Delivering a Better Tomorrow</small></div>
     </section>
 
+    <section id="view-guide" class="view-section settings-view">
+      <div class="page-heading"><button class="icon-button" id="guide-back" aria-label="ย้อนกลับ"><span class="material-icons-round">arrow_back</span></button><div><span class="eyebrow">คู่มือ</span><h1>คู่มือการทำจ่าย</h1></div><span class="material-icons-round page-icon">menu_book</span></div>
+      <div class="segmented-control" role="tablist"><button class="segment active" data-guide-vehicle="2W">2W</button><button class="segment" data-guide-vehicle="4W">4W</button></div>
+      <div class="segmented-control" role="tablist"><button class="segment active" data-guide-half="1H">1H</button><button class="segment" data-guide-half="2H">2H</button></div>
+      <div class="card guide-detail" id="guide-detail"><h2>รายละเอียดการทำจ่าย</h2><p class="muted">เลือกประเภทรถและรอบครึ่งเดือนเพื่อดูรายละเอียดตาม Configuration เดิมของระบบ</p></div>
+    </section>
     <section id="view-support" class="view-section">
       <div class="page-heading"><button class="icon-button" id="support-back" aria-label="ย้อนกลับ"><span class="material-icons-round">arrow_back</span></button><div><span class="eyebrow">กำลังใจจากคุณ</span><h1>สนับสนุนค่ากาแฟ</h1></div><span class="material-icons-round page-icon">coffee</span></div>
       <div class="card support-card"><div class="support-coffee">☕</div><h2>สนับสนุนค่ากาแฟ</h2><p class="muted">หาก TBS Incentive ช่วยให้การทำงานง่ายขึ้น<br>สามารถสนับสนุนค่ากาแฟเพื่อเป็นกำลังใจได้</p><img class="support-qr" src="support_qr.png" alt="QR สำหรับสนับสนุนค่ากาแฟ"><p class="support-caption">สแกน QR เพื่อสนับสนุน</p><p class="muted support-thanks">ขอบคุณครับ</p></div>
