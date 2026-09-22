@@ -2,7 +2,7 @@
   "appId": "com.cw.incentive",
   "appName": "TBS Incentive",
   "webDir": "www",
-  "loggingBehavior": "debug",
+  "loggingBehavior": "none",
   "server": {
     "hostname": "localhost",
     "androidScheme": "https",

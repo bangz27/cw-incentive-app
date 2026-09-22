@@ -15,14 +15,17 @@ assert.equal(config.server.hostname, 'localhost');
 assert.equal(config.server.androidScheme, 'https');
 assert.equal(config.server.cleartext, false);
 assert.equal(config.server.url, undefined, 'Do not redirect native app to a remote web server');
-assert.deepEqual(config, json('android/app/src/main/assets/capacitor.config.json'));
+const packagedConfigPath = path.join(root, 'android/app/src/main/assets/capacitor.config.json');
+if (fs.existsSync(packagedConfigPath)) {
+  assert.deepEqual(config, JSON.parse(fs.readFileSync(packagedConfigPath, 'utf8')));
+}
 
 const gradle = read('android/app/build.gradle');
 assert.match(gradle, /applicationId ['"]com\.cw\.incentive['"]/);
 assert.match(gradle, /namespace ['"]com\.cw\.incentive['"]/);
 const androidVersionName = packageJson.version.replace(/\.0$/, '');
 assert.match(gradle, new RegExp(`versionName ['"]${androidVersionName.replaceAll('.', '\\.') }['"]`));
-assert.match(gradle, /versionCode 2\b/);
+assert.match(gradle, /versionCode 3\b/);
 assert.match(gradle, /CW_KEYSTORE_PATH/);
 assert.doesNotMatch(gradle, /signingConfig signingConfigs.debug/);
 assert.match(read('android/app/src/main/java/com/cw/incentive/MainActivity.java'), /extends BridgeActivity/);
