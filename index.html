@@ -12,14 +12,14 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <title>CW Incentive</title>
+  <title>TBS Incentive</title>
 </head>
 <body>
 <div class="app-shell">
   <header class="app-header">
     <div class="brand-lockup">
       <span class="brand-mark material-icons-round">bolt</span>
-      <div><strong>CW Incentive</strong><small>Calculate · Track · Grow</small></div>
+      <div><strong>TBS Incentive</strong><small>Calculate · Track · Grow</small></div>
     </div>
     <button class="icon-button theme-toggle" aria-label="สลับโหมดสี"><span class="material-icons-round theme-icon">dark_mode</span></button>
   </header>
@@ -66,14 +66,20 @@
     <section id="view-profile" class="view-section">
       <div class="page-heading"><div><span class="eyebrow">โปรไฟล์</span><h1>ข้อมูลของฉัน</h1></div><button class="icon-button theme-toggle"><span class="material-icons-round theme-icon">dark_mode</span></button></div>
       <div class="card profile-card"><button type="button" class="profile-photo-button" id="profile-avatar-button" aria-label="เลือกรูปโปรไฟล์"><span class="profile-avatar" id="profile-avatar">CW</span><span class="photo-camera material-icons-round">photo_camera</span></button><input type="file" id="profile-photo-input" accept="image/jpeg,image/png" hidden><div class="photo-actions"><button type="button" class="text-button" id="profile-photo-change">เปลี่ยนรูป</button><button type="button" class="text-button danger-button" id="profile-photo-remove">ลบรูป</button></div><h2 id="profile-preview-name">ยังไม่ได้สร้างโปรไฟล์</h2><p class="muted">รูปจะถูกบีบอัดและเก็บไว้ในเครื่องกับโปรไฟล์ปัจจุบัน</p></div>
-      <div class="card form-card"><label class="field"><span>ชื่อ-นามสกุล</span><input id="profile-name" type="text" placeholder="กรอกชื่อ-นามสกุล"></label><label class="field"><span>Hub</span><input id="profile-hub" type="text" placeholder="ระบุ Hub"></label><label class="field"><span>ตำแหน่ง</span><select id="profile-position"><option value="">เลือกตำแหน่ง</option><option>2W Shipper</option><option>4W Shipper</option><option>Hub Agent</option></select></label><div class="field-grid"><label class="field"><span>รหัสพนักงาน</span><input id="profile-employee" type="text" placeholder="EMP-XXXX"></label><label class="field"><span>Driver ID</span><input id="profile-driver" type="text" placeholder="DR-XXXX"></label></div><button class="primary-button" id="profile-save"><span class="material-icons-round">save</span>บันทึกโปรไฟล์</button></div>
-      <div class="settings-list"><button class="settings-row" id="profile-share"><span class="material-icons-round">share</span><span><b>แชร์แอป</b><small>คัดลอกลิงก์ดาวน์โหลด APK</small></span><span class="material-icons-round ms-auto">chevron_right</span></button><button class="settings-row" id="profile-about"><span class="material-icons-round">info</span><span><b>เกี่ยวกับแอป</b><small>Powered by #BaNGz</small></span><span class="material-icons-round ms-auto">chevron_right</span></button></div>
+      <div class="card form-card"><label class="field"><span>ชื่อ-นามสกุล</span><input id="profile-name" type="text" placeholder="กรอกชื่อ-นามสกุล"></label><label class="field"><span>อีเมล</span><input id="profile-email" type="email" placeholder="ยังไม่ได้เชื่อมต่อ Google"></label><label class="field"><span>Hub</span><input id="profile-hub" type="text" placeholder="ระบุ Hub"></label><label class="field"><span>ตำแหน่ง</span><select id="profile-position"><option value="">เลือกตำแหน่ง</option><option>2W Shipper</option><option>4W Shipper</option><option>Hub Agent</option></select></label><div class="field-grid"><label class="field"><span>รหัสพนักงาน</span><input id="profile-employee" type="text" placeholder="EMP-XXXX"></label><label class="field"><span>Driver ID</span><input id="profile-driver" type="text" placeholder="DR-XXXX"></label></div><button class="primary-button" id="profile-save"><span class="material-icons-round">save</span>บันทึกโปรไฟล์</button></div>
+      <div class="card profile-manager-card"><div class="section-heading"><h2>โปรไฟล์ที่ใช้งานอยู่</h2><button type="button" class="text-button" id="profile-new">+ สร้างใหม่</button></div><div id="profile-list" class="profile-list"></div></div>
+      <div class="settings-list"><button class="settings-row" id="profile-share"><span class="material-icons-round">share</span><span><b>แชร์แอป</b><small>คัดลอกลิงก์ดาวน์โหลด APK</small></span><span class="material-icons-round ms-auto">chevron_right</span></button><button class="settings-row" id="profile-about"><span class="material-icons-round">info</span><span><b>เกี่ยวกับแอป</b><small>Powered by #BaNGz</small></span><span class="material-icons-round ms-auto">chevron_right</span></button><button class="settings-row" id="profile-support"><span class="material-icons-round">coffee</span><span><b>สนับสนุนค่ากาแฟ</b><small>หากแอปมีประโยชน์ สามารถสนับสนุนได้</small></span><span class="material-icons-round ms-auto">chevron_right</span></button></div>
+    </section>
+
+    <section id="view-support" class="view-section">
+      <div class="page-heading"><button class="icon-button" id="support-back" aria-label="ย้อนกลับ"><span class="material-icons-round">arrow_back</span></button><div><span class="eyebrow">กำลังใจจากคุณ</span><h1>สนับสนุนค่ากาแฟ</h1></div><span class="material-icons-round page-icon">coffee</span></div>
+      <div class="card support-card"><div class="support-coffee">☕</div><h2>สนับสนุนค่ากาแฟ</h2><p class="muted">หาก TBS Incentive ช่วยให้การทำงานง่ายขึ้น<br>สามารถสนับสนุนค่ากาแฟเพื่อเป็นกำลังใจได้</p><img class="support-qr" src="support_qr.png" alt="QR สำหรับสนับสนุนค่ากาแฟ"><p class="support-caption">สแกน QR เพื่อสนับสนุน</p><p class="muted support-thanks">ขอบคุณครับ</p></div>
     </section>
   </main>
 
   <nav class="bottom-nav"><button class="nav-item active" data-target="view-home"><span class="material-icons-round">home</span><span>หน้าหลัก</span></button><button class="nav-item" data-target="view-calculator"><span class="material-icons-round">calculate</span><span>คำนวณ</span></button><button class="nav-item" data-target="view-history"><span class="material-icons-round">receipt_long</span><span>รายการ</span></button><button class="nav-item" data-target="view-profile"><span class="material-icons-round">person</span><span>โปรไฟล์</span></button></nav>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="two-w-config.js"></script><script src="config.js"></script><script src="calculation-engine.js"></script><script src="record-model.js"></script><script src="calculator.js"></script><script src="export.js"></script><script src="history.js"></script><script src="dashboard.js"></script><script src="app.js"></script>
+<script src="profile-store.js"></script><script src="firebase-auth.js"></script><script src="two-w-config.js"></script><script src="config.js"></script><script src="calculation-engine.js"></script><script src="record-model.js"></script><script src="calculator.js"></script><script src="export.js"></script><script src="history.js"></script><script src="dashboard.js"></script><script src="app.js"></script>
 <script>if ('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));</script>
 </body></html>

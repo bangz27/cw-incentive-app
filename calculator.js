@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function checkSave(){const p=vehicle==='2W'?integer(parcel):(integer(s)||0)+(integer(l)||0);resultFields.save.disabled=!($('calc-date').value&&zone.value&&$('calc-hub').value.trim()&&$('calc-rider').value.trim()&&p>0&&window.cwCurrentCalculation);}
   function reset(){ $('calculator-form').reset();s.value='0';l.value='0';parcel.value='0';same.value='0';$('calc-date').valueAsDate=new Date();window.cwCurrentCalculation=null;resultFields.error.textContent='';resultFields.total.textContent='0';resultFields.grand.textContent='฿0.00';resultFields.gross.textContent='฿0.00';resultFields.same.textContent='0 ชิ้น';resultFields.deduction.textContent='-฿0.00';resultFields.net.textContent='฿0.00';renderBreakdown([]);checkSave();}
-  function loadProfileIntoForm(){try{const p=JSON.parse(localStorage.getItem('cw_profile')||'{}');$('calc-rider').value=p.name||'';$('calc-hub').value=p.hub||'';}catch{$('calc-rider').value='';$('calc-hub').value='';}}
+  function loadProfileIntoForm(){try{const p=window.TBSProfiles?.getActive()||{};$('calc-rider').value=p.fullName||p.displayName||'';$('calc-hub').value=p.hub||'';}catch{$('calc-rider').value='';$('calc-hub').value='';}}
   document.querySelectorAll('[data-vehicle-tab]').forEach(x=>x.addEventListener('click',()=>setVehicle(x.dataset.vehicleTab)));
   window.addEventListener('vehicleSelected',e=>setVehicle(e.detail));
   window.addEventListener('activeProfileChanged',()=>{loadProfileIntoForm();calculate();});

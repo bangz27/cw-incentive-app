@@ -2,7 +2,7 @@
   "name": "cw-incentive-app",
   "version": "1.1.0",
   "private": true,
-  "description": "CW Incentive mobile-first web app packaged for Android (v1.1)",
+  "description": "TBS Incentive mobile-first web app packaged for Android (v1.1)",
   "engines": { "node": ">=22 <23", "npm": ">=10 <11" },
   "scripts": {
     "test": "node --test test/*.test.js",
