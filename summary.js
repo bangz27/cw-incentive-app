@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     set('summary-box-count', `${number(sum('boxCount'))} ชิ้น`);
     set('summary-box-income', money(sum('boxAmount')));
     set('summary-deduction', money(sum('sameAddressDeduction')));
+    set('summary-same-count', `${number(sum('sameAddressCount'))} ชิ้น`);
+    set('summary-total-deduction', money(sum('sameAddressDeduction')));
     set('summary-net', money(sum('netIncentive')));
     set('summary-record-count', number(rows.length));
     const empty = document.getElementById('summary-empty');
