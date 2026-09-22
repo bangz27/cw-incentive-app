@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveRange = r => localStorage.setItem('cw_home_date_range', JSON.stringify(r));
   const setTheme = theme => { root.dataset.theme = theme; localStorage.setItem('incentive_theme', theme); document.querySelectorAll('.theme-icon').forEach(x => x.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode'); };
   setTheme(localStorage.getItem('incentive_theme') || 'light');
-  document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark')));
+  document.querySelector('.theme-toggle')?.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
 
   function showView(target) {
     const safeTarget = target === 'view-summary' || target === 'view-dashboard' ? 'view-history' : target;
