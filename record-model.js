@@ -53,6 +53,12 @@
             sameAddressCount: numericOrZero(result.sameAddressCount),
             sameAddressDeduction: numericOrZero(result.sameAddressDeduction),
             netIncentive: numericOrZero(result.netIncentive),
+            boxCount: numericOrZero(result.boxCount),
+            boxRate: numericOrZero(result.boxRate || 1.5),
+            boxAmount: numericOrZero(result.boxAmount),
+            rtsCount: numericOrZero(result.rtsCount),
+            rtsRate: numericOrZero(result.rtsRate || 1.5),
+            rtsIncome: numericOrZero(result.rtsIncome),
             tierBreakdown: Array.isArray(result.tierBreakdown) ? result.tierBreakdown : [],
             createdAt
         };
@@ -91,6 +97,12 @@
             sameAddressCount,
             sameAddressDeduction: deduction,
             netIncentive: numericOrZero(item.netIncentive ?? (gross - deduction)),
+            boxCount: numericOrZero(item.boxCount),
+            boxRate: numericOrZero(item.boxRate ?? 1.5),
+            boxAmount: numericOrZero(item.boxAmount ?? (numericOrZero(item.boxCount) * 1.5)),
+            rtsCount: numericOrZero(item.rtsCount),
+            rtsRate: numericOrZero(item.rtsRate ?? 1.5),
+            rtsIncome: numericOrZero(item.rtsIncome ?? (numericOrZero(item.rtsCount) * 1.5)),
             tierBreakdown: Array.isArray(item.tierBreakdown) ? item.tierBreakdown : [],
             createdAt: item.createdAt ?? item.timestamp ?? null,
             synced: Boolean(item.synced)

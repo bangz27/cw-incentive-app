@@ -20,7 +20,13 @@ test('createRecord returns the unified record structure', () => {
             sameAddressRate: 1.5,
             sameAddressDeduction: 15,
             netIncentive: 617,
-            tierBreakdown: [{ label: '65+', amount: 60 }]
+            tierBreakdown: [{ label: '65+', amount: 60 }],
+            boxCount: 10,
+            boxRate: 1.5,
+            boxAmount: 15,
+            rtsCount: 10,
+            rtsRate: 1.5,
+            rtsIncome: 15
         },
         createdAt: '2026-09-22T00:00:00.000Z'
     });
@@ -40,6 +46,12 @@ test('createRecord returns the unified record structure', () => {
         sameAddressCount: 10,
         sameAddressDeduction: 15,
         netIncentive: 617,
+        boxCount: 10,
+        boxRate: 1.5,
+        boxAmount: 15,
+        rtsCount: 10,
+        rtsRate: 1.5,
+        rtsIncome: 15,
         tierBreakdown: [{ label: '65+', amount: 60 }],
         createdAt: '2026-09-22T00:00:00.000Z'
     });
@@ -76,4 +88,6 @@ test('legacy records normalize without mutating the raw payload', () => {
     assert.equal(normalized[0].grossIncentive, 632);
     assert.equal(normalized[0].sameAddressDeduction, 0);
     assert.equal(normalized[0].netIncentive, 632);
+    assert.equal(normalized[0].boxCount, 0);
+    assert.equal(normalized[0].rtsCount, 0);
 });
