@@ -118,11 +118,13 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 
 /* Date Range overflow fix: responsive behavior only; structure, typography and UX unchanged. */
 @media (max-width: 430px){
-  .home-period{min-width:0;}
+  .home-period{min-width:0;flex-wrap:wrap;}
   .home-period-main{flex:1 1 auto;min-width:0;}
   .home-period>#home-date-picker{flex:0 1 auto;min-width:0;max-width:100%;padding-left:10px;padding-right:10px;white-space:nowrap;}
+  .home-period>.date-range-editor{flex:1 1 100%;width:100%;max-width:100%;min-width:0;}
 }
 @media (max-width: 380px){
   .home-period{gap:8px;}
   .home-period>#home-date-picker{font-size:11px;padding-left:7px;padding-right:7px;}
 }
+.home-period>.date-range-editor{display:grid;box-sizing:border-box;flex:1 1 100%;width:100%;min-width:0;max-width:100%;}
