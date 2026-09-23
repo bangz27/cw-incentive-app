@@ -1,11 +1,61 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const body=document.getElementById('history-body'), save=document.getElementById('btn-save'), sync=document.getElementById('btn-sync-history');
-  const money=n=>`฿${Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
-  const profile=()=>window.TBSProfiles?.getActive?.()||(()=>{try{return JSON.parse(localStorage.getItem('cw_profile')||'{}')}catch{return {}}})();
+  const body = document.getElementById('history-body');
+  const save = document.getElementById('btn-save');
+  const money = n => `฿${Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const profile = () => window.TBSProfiles?.getActive?.() || (() => { try { return JSON.parse(localStorage.getItem('cw_profile') || '{}'); } catch { return {}; } })();
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
   let activeFilter = 'ทั้งหมด';
-  function load(){if(!body||!window.CWRecordModel)return;const rows=window.CWRecordModel.readRecords(localStorage).filter(r => activeFilter === 'ทั้งหมด' || r.vehicleType === activeFilter);if(!rows.length){body.className='stack-list empty-state';body.innerHTML='<span class="material-icons-round">inbox</span><p>ยังไม่มีรายการบันทึก</p>';return;}body.className='stack-list';body.innerHTML=rows.map(r=>`<div class="record-card"><span class="record-icon material-icons-round">${r.vehicleType==='2W'?'two_wheeler':'local_shipping'}</span><div><strong>${r.vehicleType} · Zone ${r.zone}</strong><small>${r.date} · ${r.parcel.toLocaleString()} ส่งสำเร็จ · ${r.fullName||'ไม่ระบุชื่อ'}</small><small>บ้านซ้ำ ${r.sameAddressCount||0} ชิ้น · กล่อง ${r.boxCount||0} ชิ้น · RTS ${r.rtsCount||0} ชิ้น</small></div><div class="record-money">${money(r.netIncentive)}<small>หัก ${money(r.sameAddressDeduction)}</small></div></div>`).join('');}
-  save?.addEventListener('click',()=>{const result=window.cwCurrentCalculation;if(!result){alert('กรุณากรอกข้อมูลและคำนวณก่อนบันทึก');return;}const p=profile();const record=window.CWRecordModel.createRecord({id:Date.now(),date:document.getElementById('calc-date').value,fullName:document.getElementById('calc-rider').value.trim()||p.fullName||p.name||'',hub:document.getElementById('calc-hub').value.trim()||p.hub||'',driverId:p.driverId||'',result,createdAt:new Date().toISOString()});record.synced=false;const raw=window.CWRecordModel.readRawRecords(localStorage);raw.unshift(record);localStorage.setItem('incentive_history',JSON.stringify(raw));load();window.dispatchEvent(new Event('historyUpdated'));const old=save.innerHTML;save.innerHTML='<span class="material-icons-round">check_circle</span>บันทึกสำเร็จ';setTimeout(()=>{save.innerHTML=old;document.getElementById('btn-reset')?.click();},900);});
-  sync?.addEventListener('click',async()=>{const raw=window.CWRecordModel.readRawRecords(localStorage), rows=raw.map(window.CWRecordModel.toUnifiedRecord).filter(r=>!r.synced);if(!rows.length){alert('ไม่มีรายการค้างซิงค์');return;}if(!window.APP_CONFIG?.GOOGLE_SCRIPT_URL){alert('ยังไม่ได้ตั้งค่า Sync');return;}sync.disabled=true;try{const ids=new Set(rows.map(r=>r.id));await fetch(APP_CONFIG.GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'saveHistory',data:raw.filter(r=>ids.has(r.id))})});localStorage.setItem('incentive_history',JSON.stringify(raw.map(r=>ids.has(r.id)?{...r,synced:true}:r)));load();alert(`ซิงค์สำเร็จ ${rows.length} รายการ`);}catch(e){alert('ซิงค์ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต');}finally{sync.disabled=false;}});
-  document.querySelectorAll('.filter-chip').forEach(chip=>chip.addEventListener('click',()=>{activeFilter=chip.textContent.trim();document.querySelectorAll('.filter-chip').forEach(x=>x.classList.toggle('active', x === chip));load();}));
+
+  function rawRows() { return window.CWRecordModel?.readRawRecords(localStorage) || []; }
+  function load() {
+    if (!body || !window.CWRecordModel) return;
+    const rows = window.CWRecordModel.readRecords(localStorage).filter(r => activeFilter === 'ทั้งหมด' || r.vehicleType === activeFilter);
+    if (!rows.length) { body.className = 'stack-list empty-state'; body.innerHTML = '<span class="material-icons-round">inbox</span><p>ยังไม่มีรายการบันทึก</p>'; return; }
+    body.className = 'stack-list';
+    body.innerHTML = rows.map(r => `<article class="record-card" data-record-id="${esc(r.id)}"><span class="record-icon material-icons-round">${r.vehicleType === '2W' ? 'two_wheeler' : 'local_shipping'}</span><div class="record-main"><strong>${esc(r.date)} · ${esc(r.vehicleType)} · ${esc(r.zone)}</strong><small>ส่งสำเร็จ ${Number(r.parcel || 0).toLocaleString()} ชิ้น · ${esc(r.fullName || 'ไม่ระบุชื่อ')}</small><small>บ้านซ้ำ ${r.sameAddressCount || 0} ชิ้น · RTS ${r.rtsCount || 0} ชิ้น · ${esc(r.position || 'ตำแหน่งจาก Profile ปัจจุบัน')}</small><div class="record-actions"><button type="button" class="text-button record-edit" data-edit-record="${esc(r.id)}"><span class="material-icons-round">edit</span>แก้ไข</button><button type="button" class="text-button danger-button record-delete" data-delete-record="${esc(r.id)}"><span class="material-icons-round">delete</span>ลบ</button></div></div><div class="record-money">${money(r.netIncentive)}<small>หัก ${money(r.sameAddressDeduction)}</small></div></article>`).join('');
+    body.querySelectorAll('[data-edit-record]').forEach(button => button.addEventListener('click', () => editRecord(button.dataset.editRecord)));
+    body.querySelectorAll('[data-delete-record]').forEach(button => button.addEventListener('click', () => deleteRecord(button.dataset.deleteRecord)));
+  }
+  function editRecord(id) {
+    const record = window.CWRecordModel.readRecords(localStorage).find(r => String(r.id) === String(id));
+    if (!record) return;
+    window.cwEditingRecordId = record.id;
+    window.dispatchEvent(new CustomEvent('vehicleSelected', { detail: record.vehicleType }));
+    document.getElementById('calc-date').value = record.date || '';
+    document.getElementById('calc-zone').value = record.zone || '';
+    document.getElementById('calc-parcel').value = record.parcel || 0;
+    document.getElementById('calc-size-s').value = record.sizeS || 0;
+    document.getElementById('calc-size-l').value = record.sizeL || 0;
+    document.getElementById('calc-same-address').value = record.sameAddressCount || 0;
+    document.getElementById('calc-rts').value = record.rtsCount || 0;
+    document.getElementById('calc-rider').value = record.fullName || profile().fullName || '';
+    document.getElementById('calc-hub').value = record.hub || profile().hub || '';
+    ['calc-date', 'calc-zone', 'calc-parcel', 'calc-size-s', 'calc-size-l', 'calc-same-address', 'calc-rts'].forEach(id => document.getElementById(id)?.dispatchEvent(new Event('input', { bubbles: true })));
+    window.dispatchEvent(new CustomEvent('showView', { detail: 'view-calculator' }));
+  }
+  function deleteRecord(id) {
+    const rows = rawRows();
+    if (!rows.some(r => String(r.id) === String(id))) return;
+    if (!confirm('ต้องการลบรายการนี้หรือไม่? ข้อมูลรายการอื่นจะไม่ถูกเปลี่ยนแปลง')) return;
+    localStorage.setItem('incentive_history', JSON.stringify(rows.filter(r => String(r.id) !== String(id))));
+    load();
+    window.dispatchEvent(new Event('historyUpdated'));
+  }
+  save?.addEventListener('click', () => {
+    const result = window.cwCurrentCalculation;
+    if (!result) { alert('กรุณากรอกข้อมูลและคำนวณก่อนบันทึก'); return; }
+    const p = profile();
+    const rows = rawRows();
+    const record = window.CWRecordModel.createRecord({ id: window.cwEditingRecordId || Date.now(), date: document.getElementById('calc-date').value, fullName: document.getElementById('calc-rider').value.trim() || p.fullName || p.name || '', hub: document.getElementById('calc-hub').value.trim() || p.hub || '', driverId: p.driverId || '', result, createdAt: new Date().toISOString() });
+    record.synced = false;
+    const next = window.cwEditingRecordId ? rows.map(row => String(row.id) === String(window.cwEditingRecordId) ? record : row) : [record, ...rows];
+    localStorage.setItem('incentive_history', JSON.stringify(next));
+    window.cwEditingRecordId = null;
+    load();
+    window.dispatchEvent(new Event('historyUpdated'));
+    const old = save.innerHTML; save.innerHTML = '<span class="material-icons-round">check_circle</span>บันทึกสำเร็จ';
+    setTimeout(() => { save.innerHTML = old; document.getElementById('btn-reset')?.click(); }, 900);
+  });
+  document.querySelectorAll('.filter-chip').forEach(chip => chip.addEventListener('click', () => { activeFilter = chip.textContent.trim(); document.querySelectorAll('.filter-chip').forEach(x => x.classList.toggle('active', x === chip)); load(); }));
   load();
 });
