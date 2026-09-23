@@ -92,3 +92,26 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 
 /* Final viewport override: this rule intentionally follows all legacy responsive rules. */
 .app-content{padding-top:4px;padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+
+/* V1.5 Master Brief: Indigo + Orange theme tokens. Color-only overrides; layout unchanged. */
+:root{
+  --color-primary:#4F46E5;--color-secondary:#4338CA;--color-accent:#F59E0B;--color-primary-soft:#EEF2FF;
+  --color-background:#F8FAFC;--color-card:#FFFFFF;--color-text:#0F172A;--color-text-secondary:#64748B;--color-border:#E2E8F0;
+  --color-success:#16A34A;--color-warning:#F59E0B;--color-error:#DC2626;
+  --orange:var(--color-accent);--orange-dark:#D97706;--orange-soft:#FEF3C7;--bg:var(--color-background);--card:var(--color-card);--text:var(--color-text);--muted:var(--color-text-secondary);--border:var(--color-border);--success:var(--color-success);--danger:var(--color-error)
+}
+:root[data-theme=dark]{
+  --color-primary:#4F46E5;--color-secondary:#4338CA;--color-accent:#F59E0B;--color-primary-soft:#312E81;
+  --color-background:#0F172A;--color-card:#1E293B;--color-text:#F8FAFC;--color-text-secondary:#94A3B8;--color-border:#334155;
+  --color-success:#22C55E;--color-warning:#F59E0B;--color-error:#EF4444;
+  --orange:var(--color-accent);--orange-dark:#FBBF24;--orange-soft:#312E81;--bg:var(--color-background);--card:var(--color-card);--text:var(--color-text);--muted:var(--color-text-secondary);--border:var(--color-border);--success:var(--color-success);--danger:var(--color-error)
+}
+.primary-button{background:var(--color-primary);box-shadow:0 6px 14px rgba(79,70,229,.16)}.primary-button:hover{background:var(--color-secondary)}
+.text-button{color:var(--color-primary)}.icon-button:hover{background:var(--color-primary-soft);color:var(--color-primary)}
+.nav-item.active{color:var(--color-primary)}.segment.active{color:var(--color-primary)}.filter-chip.active{background:var(--color-primary);border-color:var(--color-primary)}
+.field input:focus,.field select:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(79,70,229,.16)}
+.vehicle-icon,.page-icon,.summary-filter-card .section-heading>.material-icons-round,.summary-empty .material-icons-round,.settings-leading .material-icons-round{color:var(--color-primary)!important}
+.hero-card.home-total,.summary-highlight,.home-summary-card{background:var(--color-accent)}.summary-info>.material-icons-round,.home-note>.material-icons-round{background:var(--color-accent)}
+.result-top strong,.home-summary-row strong{color:var(--color-accent)}.result-badge{background:var(--color-primary-soft);color:var(--color-secondary)}
+.settings-row>.material-icons-round:first-child{color:var(--color-primary)}
+.home-period .text-button{background:var(--color-primary-soft)}
