@@ -25,7 +25,7 @@ assert.match(gradle, /applicationId ['"]com\.cw\.incentive['"]/);
 assert.match(gradle, /namespace ['"]com\.cw\.incentive['"]/);
 const androidVersionName = packageJson.version.replace(/\.0$/, '');
 assert.match(gradle, new RegExp(`versionName ['"]${androidVersionName.replaceAll('.', '\\.') }['"]`));
-assert.match(gradle, /versionCode 3\b/);
+assert.match(gradle, /versionCode 4\b/);
 assert.match(gradle, /CW_KEYSTORE_PATH/);
 assert.doesNotMatch(gradle, /signingConfig signingConfigs.debug/);
 assert.match(read('android/app/src/main/java/com/cw/incentive/MainActivity.java'), /extends BridgeActivity/);
