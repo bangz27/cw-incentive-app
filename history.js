@@ -28,9 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calc-size-l').value = record.sizeL || 0;
     document.getElementById('calc-same-address').value = record.sameAddressCount || 0;
     document.getElementById('calc-rts').value = record.rtsCount || 0;
-    document.getElementById('calc-rider').value = record.fullName || profile().fullName || '';
-    document.getElementById('calc-hub').value = record.hub || profile().hub || '';
-    ['calc-date', 'calc-zone', 'calc-parcel', 'calc-size-s', 'calc-size-l', 'calc-same-address', 'calc-rts'].forEach(id => document.getElementById(id)?.dispatchEvent(new Event('input', { bubbles: true })));
+        ['calc-date', 'calc-zone', 'calc-parcel', 'calc-size-s', 'calc-size-l', 'calc-same-address', 'calc-rts'].forEach(id => document.getElementById(id)?.dispatchEvent(new Event('input', { bubbles: true })));
     window.dispatchEvent(new CustomEvent('showView', { detail: 'view-calculator' }));
   }
   function deleteRecord(id) {
@@ -43,18 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   save?.addEventListener('click', () => {
     const result = window.cwCurrentCalculation;
-    if (!result) { alert('กรุณากรอกข้อมูลและคำนวณก่อนบันทึก'); return; }
+    if (!result) { window.TBSShowToast?.('กรุณากรอกข้อมูลและคำนวณก่อนบันทึก'); return; }
     const p = profile();
     const rows = rawRows();
-    const record = window.CWRecordModel.createRecord({ id: window.cwEditingRecordId || Date.now(), date: document.getElementById('calc-date').value, fullName: document.getElementById('calc-rider').value.trim() || p.fullName || p.name || '', hub: document.getElementById('calc-hub').value.trim() || p.hub || '', driverId: p.driverId || '', result, createdAt: new Date().toISOString() });
+    const record = window.CWRecordModel.createRecord({ id: window.cwEditingRecordId || Date.now(), date: document.getElementById('calc-date').value, fullName: p.fullName || p.name || '', hub: p.hub || '', driverId: p.driverId || '', result, createdAt: new Date().toISOString() });
     record.synced = false;
     const next = window.cwEditingRecordId ? rows.map(row => String(row.id) === String(window.cwEditingRecordId) ? record : row) : [record, ...rows];
     localStorage.setItem('incentive_history', JSON.stringify(next));
     window.cwEditingRecordId = null;
     load();
     window.dispatchEvent(new Event('historyUpdated'));
-    const old = save.innerHTML; save.innerHTML = '<span class="material-icons-round">check_circle</span>บันทึกสำเร็จ';
-    setTimeout(() => { save.innerHTML = old; document.getElementById('btn-reset')?.click(); }, 900);
+    window.TBSShowToast?.('✓ บันทึกข้อมูลสำเร็จ'); const old = save.innerHTML; save.innerHTML = '<span class="material-icons-round">check_circle</span>บันทึกสำเร็จ'; setTimeout(() => { save.innerHTML = old; document.getElementById('btn-reset')?.click(); }, 1500);
   });
   document.querySelectorAll('.filter-chip').forEach(chip => chip.addEventListener('click', () => { activeFilter = chip.textContent.trim(); document.querySelectorAll('.filter-chip').forEach(x => x.classList.toggle('active', x === chip)); load(); }));
   load();
