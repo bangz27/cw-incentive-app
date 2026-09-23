@@ -73,3 +73,6 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 :root[data-theme="dark"] .home-summary-card,.home-period{background:var(--card);border-color:var(--border)}
 :root[data-theme="dark"] .home-summary-row{background:var(--card);color:var(--text);border-color:var(--border)}
 :root[data-theme="dark"] .settings-leading{background:var(--orange-soft)}
+
+/* V1.4 mobile calendar fit: preserve native date controls and range behavior. */
+.home-period{overflow:hidden}.home-period-main{min-width:0}.home-period-main>div{min-width:0}.home-period-main b{overflow-wrap:anywhere}.date-range-editor{grid-template-columns:repeat(2,minmax(0,1fr));min-width:0;overflow:hidden}.date-range-editor .field{min-width:0}.date-range-editor .field input{width:100%;min-width:0;max-width:100%;font-size:15px}.date-range-actions{min-width:0;flex-wrap:wrap}.date-range-actions .text-button,.date-range-actions .primary-button{flex:0 1 auto;min-width:0}@media(max-width:430px){.date-range-editor{grid-template-columns:1fr}.date-range-actions{justify-content:stretch}.date-range-actions .text-button,.date-range-actions .primary-button{flex:1 1 0}.date-range-editor .field input{padding-left:10px;padding-right:10px}}
