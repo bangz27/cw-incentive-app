@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function checkSave(){const p=vehicle==='2W'?integer(parcel):(integer(s)||0)+(integer(l)||0);resultFields.save.classList.toggle('is-ready',Boolean($('calc-date').value&&zone.value&&p>0&&window.cwCurrentCalculation));}
   function reset(){ const keepZone=zone.value||localStorage.getItem('cw_last_zone')||''; $('calculator-form').reset(); zone.value=keepZone; resultCard?.classList.remove('has-result');s.value='0';l.value='0';parcel.value='0';same.value='0';rts.value='0';$('calc-date').valueAsDate=new Date();window.cwCurrentCalculation=null;resultFields.error.textContent='';['total','grand','gross','same','box','rts','deduction','net'].forEach(k=>{if(resultFields[k])resultFields[k].textContent=k==='deduction'?'‑฿0.00':k==='same'||k==='box'||k==='rts'?'0 ชิ้น':k==='total'?'0':'฿0.00';});renderBreakdown([]);checkSave();}
-  function loadProfileIntoForm(){}
+  function loadProfileIntoForm(){ const p=window.TBSProfiles?.getActive?.()||{}; const pos=String(p.position||'').toLowerCase(); if(pos.includes('2w')) setVehicle('2W'); else if(pos.includes('4w')) setVehicle('4W'); }
   document.querySelectorAll('[data-vehicle-tab]').forEach(x=>x.addEventListener('click',()=>setVehicle(x.dataset.vehicleTab)));
   window.addEventListener('vehicleSelected',e=>setVehicle(e.detail));
   window.addEventListener('activeProfileChanged',()=>{loadProfileIntoForm();calculate();});
   [zone,s,l,parcel,same,rts,$('calc-date')].forEach(el=>{el?.addEventListener('input',calculate);el?.addEventListener('change',calculate);});
-  $('btn-reset')?.addEventListener('click',reset); initZones(); zone.value=localStorage.getItem('cw_last_zone')||''; zone?.addEventListener('change',()=>localStorage.setItem('cw_last_zone',zone.value)); $('calc-date').valueAsDate=new Date(); loadProfileIntoForm(); setVehicle('4W');
+  $('btn-reset')?.addEventListener('click',reset); initZones(); zone.value=localStorage.getItem('cw_last_zone')||''; zone?.addEventListener('change',()=>localStorage.setItem('cw_last_zone',zone.value)); $('calc-date').valueAsDate=new Date(); loadProfileIntoForm(); if (!window.TBSProfiles?.getActive?.()?.position) setVehicle('4W');
 });
