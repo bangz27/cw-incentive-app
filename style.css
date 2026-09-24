@@ -189,3 +189,9 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 #view-calculator[data-calculator-vehicle="2W"] .result-card .result-badge{background:rgba(98,86,217,.10);color:#6256D9}
 @media(max-width:370px){#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card{padding:16px;gap:14px}#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card{padding:14px;gap:10px}}
 @media(prefers-reduced-motion:reduce){#view-calculator .calculator-position-selector .segment,#view-calculator .calculator-form-card{transition:none}}
+
+
+/* Calculator micro typography: lower text only; controls and icons keep their geometry. */
+#view-calculator .calculator-form-card .field-label-text{display:inline-block;position:relative;top:2px}
+#view-calculator .calculator-form-card .field input,
+#view-calculator .calculator-form-card .field select{padding-top:2px}
