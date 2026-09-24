@@ -145,3 +145,9 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 
 /* Final Master UI Correction: contact row parity, selector lock sizing and COD alignment. */
 .contact-card{flex-direction:row;align-items:center}.contact-card .contact-action{margin-left:auto;color:var(--muted);flex:0 0 auto}.contact-card .contact-icon.material-icons-round{font-size:22px}.settings-toggle-row>span:nth-of-type(2){min-width:0;flex:1}.settings-toggle-ui{margin-left:auto}.calculator-position-selector{height:54px;padding:3px;top:calc(68px + env(safe-area-inset-top));margin-bottom:12px}.calculator-position-selector .segment{min-height:42px;border-radius:11px}.settings-view .settings-footer{margin-top:24px}.settings-view .settings-footer img{max-width:100%;height:auto;object-fit:contain}
+
+/* Bug Fix #2: Calculator header + position selector fixed layer. Only calculator content scrolls beneath it. */
+.app-shell.calculator-fixed-layer .app-content{padding-top:calc(68px + env(safe-area-inset-top) + 54px + 12px)}
+.app-shell.calculator-fixed-layer .calculator-position-selector{position:fixed;top:calc(68px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(680px,calc(100% - 32px));height:54px;margin:0;z-index:25}
+@media(max-width:430px){.app-shell.calculator-fixed-layer .app-content{padding-top:calc(68px + env(safe-area-inset-top) + 54px + 12px)}.app-shell.calculator-fixed-layer .calculator-position-selector{width:calc(100% - 24px)}}
+@media(max-width:340px){.app-shell.calculator-fixed-layer .calculator-position-selector{width:calc(100% - 16px)}}

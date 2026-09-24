@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showView(target) {
     const safeTarget = target === 'view-summary' || target === 'view-dashboard' ? 'view-history' : target;
     document.querySelectorAll('.view-section').forEach(v => v.classList.toggle('active', v.id === safeTarget));
+    document.querySelector('.app-shell')?.classList.toggle('calculator-fixed-layer', safeTarget === 'view-calculator');
     document.querySelectorAll('[data-target]').forEach(n => n.classList.toggle('active', n.dataset.target === safeTarget && n.classList.contains('nav-item')));
     const contexts = {'view-home':['TBS Incentive','สรุปรายได้ของคุณ'],'view-calculator':['TBS Incentive','เลือกตำแหน่งจัดส่ง'],'view-profile':['TBS Incentive','Profile • ข้อมูลของฉัน'],'view-history':['TBS Incentive','รายการ • ประวัติคำนวณ'],'view-settings':['TBS Incentive','Setting • ตั้งค่าและข้อมูลเพิ่มเติม'],'view-guide':['TBS Incentive','คู่มือการใช้งาน'],'view-payment-details':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-support':['TBS Incentive','สนับสนุนค่ากาแฟ'],'view-about':['TBS Incentive','นโยบายความเป็นส่วนตัว'],'view-contact':['TBS Incentive','ข้อมูลการติดต่อ']};
     const context = contexts[safeTarget] || contexts['view-home'];
