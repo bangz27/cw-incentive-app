@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@capacitor/android": "7.6.9",
+    "@capacitor/camera": "^7.0.2",
     "@capacitor/core": "7.6.9",
     "@capacitor/local-notifications": "^7.0.3"
   },

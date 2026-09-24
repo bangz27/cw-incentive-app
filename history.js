@@ -21,9 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const record = window.CWRecordModel.readRecords(localStorage).find(r => String(r.id) === String(id));
     if (!record) return;
     window.cwEditingRecordId = record.id;
+    if (save) { save.classList.add('edit-mode'); save.innerHTML = '<span class="material-icons-round">check_circle</span>บันทึกการแก้ไข'; }
     window.dispatchEvent(new CustomEvent('vehicleSelected', { detail: record.vehicleType }));
     document.getElementById('calc-date').value = record.date || '';
-    document.getElementById('calc-zone').value = record.zone || '';
+    const zoneSelect = document.getElementById('calc-zone');
+    if (zoneSelect) {
+      const zoneValue = String(record.zone || '');
+      const matchingZone = [...zoneSelect.options].find(option => option.value === zoneValue || option.textContent.includes(zoneValue) || option.value.includes(zoneValue));
+      zoneSelect.value = matchingZone?.value || zoneValue;
+    }
     document.getElementById('calc-parcel').value = record.parcel || 0;
     document.getElementById('calc-size-s').value = record.sizeS || 0;
     document.getElementById('calc-size-l').value = record.sizeL || 0;
@@ -45,14 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!result) { window.TBSShowToast?.('กรุณากรอกข้อมูลและคำนวณก่อนบันทึก'); return; }
     const p = profile();
     const rows = rawRows();
-    const record = window.CWRecordModel.createRecord({ id: window.cwEditingRecordId || Date.now(), date: document.getElementById('calc-date').value, fullName: p.fullName || p.name || '', hub: p.hub || '', driverId: p.driverId || '', position: p.position || '', result, createdAt: new Date().toISOString() });
+    const editing = Boolean(window.cwEditingRecordId);
+    const recordId = window.cwEditingRecordId || Date.now();
+    const record = window.CWRecordModel.createRecord({ id: recordId, date: document.getElementById('calc-date').value, fullName: p.fullName || p.name || '', hub: p.hub || '', driverId: p.driverId || '', position: p.position || '', result, createdAt: editing ? (rows.find(row => String(row.id) === String(recordId))?.createdAt || new Date().toISOString()) : new Date().toISOString() });
     record.synced = false;
-    const next = window.cwEditingRecordId ? rows.map(row => String(row.id) === String(window.cwEditingRecordId) ? record : row) : [record, ...rows];
+    const next = editing ? rows.map(row => String(row.id) === String(recordId) ? record : row) : [record, ...rows];
     localStorage.setItem('incentive_history', JSON.stringify(next));
     window.cwEditingRecordId = null;
     load();
     window.dispatchEvent(new Event('historyUpdated'));
-    const old = save.innerHTML; save.classList.add('save-success'); save.innerHTML = '<span class="material-icons-round">check_circle</span>บันทึกสำเร็จ'; setTimeout(() => { save.classList.remove('save-success'); save.innerHTML = old; document.getElementById('btn-reset')?.click(); }, 1800);
+    const old = save.innerHTML; save.classList.add('save-success'); save.innerHTML = `<span class="material-icons-round">check_circle</span>${editing ? 'แก้ไขสำเร็จ' : 'บันทึกสำเร็จ'}`; setTimeout(() => { save.classList.remove('save-success','edit-mode'); save.innerHTML = old; document.getElementById('btn-reset')?.click(); if (editing) window.dispatchEvent(new CustomEvent('showView', { detail: 'view-history' })); }, 1800);
   });
   document.querySelectorAll('.filter-chip').forEach(chip => chip.addEventListener('click', () => { activeFilter = chip.textContent.trim(); document.querySelectorAll('.filter-chip').forEach(x => x.classList.toggle('active', x === chip)); load(); }));
   load();
