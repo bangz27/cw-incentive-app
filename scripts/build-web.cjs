@@ -6,7 +6,7 @@ const output = path.join(root, 'www');
 const files = [
   'index.html', 'style.css', 'app.js', 'calculator.js', 'config.js',
   'dashboard.js', 'export.js', 'history.js', 'manifest.json', 'service-worker.js',
-  'calculation-engine.js', 'two-w-config.js', 'record-model.js', 'profile-store.js', 'firebase-auth.js', 'support_qr.png', 'tbs_icon.png', 'tbs_banner.jpg', 'capacitor-core.js', 'capacitor-local-notifications.js', 'capacitor-camera.js'
+  'calculation-engine.js', 'two-w-config.js', 'record-model.js', 'profile-store.js', 'firebase-auth.js', 'support_qr.png', 'tbs_icon.png', 'tbs_icon_master.png', 'adaptive-foreground.png', 'playstore.png', 'appstore.png', 'favicon.png', 'apple-touch-icon.png', 'tbs_banner.jpg', 'capacitor-core.js', 'capacitor-local-notifications.js', 'capacitor-camera.js'
 ];
 // Fail before touching build output if a source asset is missing.
 for (const file of files) {
