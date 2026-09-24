@@ -161,3 +161,31 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 .settings-view .settings-footer img{width:100%;height:100%;display:block;object-fit:contain;border-radius:0}
 /* History edit mode uses the existing save control without creating a new record. */
 #btn-save.edit-mode{background:var(--color-primary);box-shadow:0 6px 14px rgba(37,99,235,.2)}
+
+
+/* Calculator UI refinement: one TBS system with distinct 4W and 2W density/accent. */
+#view-calculator .calculator-position-selector{border:1px solid var(--border);box-shadow:0 4px 14px rgba(15,23,42,.06)}
+#view-calculator .calculator-position-selector .segment{transition:color .18s ease,background .18s ease,box-shadow .18s ease}
+#view-calculator[data-calculator-vehicle="4W"] .calculator-position-selector .segment.active{color:var(--orange-dark);box-shadow:0 3px 8px rgba(249,115,22,.14)}
+#view-calculator[data-calculator-vehicle="2W"] .calculator-position-selector .segment.active{color:#6256D9;box-shadow:0 3px 8px rgba(98,86,217,.16)}
+#view-calculator .calculator-form-card{transition:border-color .18s ease,box-shadow .18s ease,padding .18s ease}
+#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card{border-color:rgba(249,115,22,.28);padding:20px;gap:16px;box-shadow:0 6px 18px rgba(249,115,22,.08)}
+#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card{border-color:rgba(98,86,217,.24);padding:16px;gap:12px;box-shadow:0 5px 16px rgba(98,86,217,.07)}
+#view-calculator .calculator-form-card .field-label{display:flex;align-items:center;gap:6px;min-height:22px;line-height:1.35}
+#view-calculator .calculator-form-card .field-icon{font-size:18px;line-height:1;color:var(--muted)}
+#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card .field-icon{color:var(--orange-dark)}
+#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card .field-icon{color:#6256D9}
+#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card .field input,
+#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card .field select{height:56px;border-radius:15px;border-color:rgba(249,115,22,.24)}
+#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card .field input:focus,
+#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card .field select:focus{border-color:var(--orange-dark);box-shadow:0 0 0 3px rgba(249,115,22,.13)}
+#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card .field input,
+#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card .field select{height:48px;border-radius:12px;border-color:rgba(98,86,217,.22)}
+#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card .field input:focus,
+#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card .field select:focus{border-color:#6256D9;box-shadow:0 0 0 3px rgba(98,86,217,.12)}
+#view-calculator[data-calculator-vehicle="4W"] .result-card{border-color:rgba(249,115,22,.28);box-shadow:0 6px 18px rgba(249,115,22,.08)}
+#view-calculator[data-calculator-vehicle="2W"] .result-card{border-color:rgba(98,86,217,.24);box-shadow:0 5px 16px rgba(98,86,217,.07)}
+#view-calculator[data-calculator-vehicle="2W"] .result-card .result-top strong{color:#6256D9}
+#view-calculator[data-calculator-vehicle="2W"] .result-card .result-badge{background:rgba(98,86,217,.10);color:#6256D9}
+@media(max-width:370px){#view-calculator[data-calculator-vehicle="4W"] .calculator-form-card{padding:16px;gap:14px}#view-calculator[data-calculator-vehicle="2W"] .calculator-form-card{padding:14px;gap:10px}}
+@media(prefers-reduced-motion:reduce){#view-calculator .calculator-position-selector .segment,#view-calculator .calculator-form-card{transition:none}}
