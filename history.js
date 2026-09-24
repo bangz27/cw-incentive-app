@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.cwEditingRecordId = null;
     load();
     window.dispatchEvent(new Event('historyUpdated'));
-    window.TBSShowToast?.('✓ บันทึกข้อมูลสำเร็จ'); const old = save.innerHTML; save.innerHTML = '<span class="material-icons-round">check_circle</span>บันทึกสำเร็จ'; setTimeout(() => { save.innerHTML = old; document.getElementById('btn-reset')?.click(); }, 1500);
+    const old = save.innerHTML; save.classList.add('save-success'); save.innerHTML = '<span class="material-icons-round">check_circle</span>บันทึกสำเร็จ'; setTimeout(() => { save.classList.remove('save-success'); save.innerHTML = old; document.getElementById('btn-reset')?.click(); }, 1800);
   });
   document.querySelectorAll('.filter-chip').forEach(chip => chip.addEventListener('click', () => { activeFilter = chip.textContent.trim(); document.querySelectorAll('.filter-chip').forEach(x => x.classList.toggle('active', x === chip)); load(); }));
   load();

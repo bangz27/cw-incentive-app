@@ -19,15 +19,15 @@
 <div class="app-shell">
   <header class="app-header">
     <div class="brand-lockup">
-      <span class="brand-mark material-icons-round">bolt</span>
-      <div><strong>TBS Incentive</strong><small>SPX Express</small></div>
+      <img class="brand-mark-image" src="tbs_icon.png" alt="TBS Incentive">
+      <div><strong id="header-title">TBS Incentive</strong><small id="header-subtitle">สรุปรายได้ของคุณ</small></div>
     </div>
-    <button class="icon-button theme-toggle" aria-label="สลับโหมดสี"><span class="material-icons-round theme-icon">dark_mode</span></button>
+    <div class="header-actions"><button class="icon-button header-refresh hidden" id="header-refresh" aria-label="รีเฟรชฟอร์มคำนวณ"><span class="material-icons-round">refresh</span></button><button class="icon-button theme-toggle" aria-label="สลับโหมดสี"><span class="material-icons-round theme-icon">dark_mode</span></button></div>
   </header>
 
   <main class="app-content">
     <section id="view-home" class="view-section active home-view">
-      <div class="greeting-row"><div><span class="eyebrow">TBS Incentive</span><h1 id="home-greeting">สวัสดีครับ</h1><small class="home-tagline">Drive · Deliver · Grow Together</small></div><span class="avatar" id="home-avatar">TB</span></div>
+      <div class="greeting-row"><div><h1 id="home-greeting">เริ่มคำนวณรายได้ของคุณ</h1></div><span class="avatar" id="home-avatar">TB</span></div>
       <div class="home-period card" id="home-period-card">
         <div class="home-period-main"><span class="material-icons-round">calendar_month</span><div><small>รอบวันที่</small><b id="home-date-range">เลือกช่วงวันที่</b></div></div>
         <button type="button" class="text-button" id="home-date-picker"><span class="material-icons-round">calendar_month</span>เลือกช่วงวันที่ <span class="material-icons-round">chevron_right</span></button>
@@ -53,7 +53,7 @@
         <div class="field-grid"><label class="field"><span>บ้านซ้ำ (ชิ้น)</span><input type="number" id="calc-same-address" min="0" value="0" inputmode="numeric"><small id="same-address-rate">-1.5฿/ชิ้น</small></label><label class="field rts-field"><span class="rts-label">งาน RTS (ชิ้น)</span><input type="number" id="calc-rts" min="0" value="0" inputmode="numeric"><small>+1.5฿/ชิ้น</small></label></div>
         <div id="calc-error" class="form-error" role="alert"></div>
       </form></div>
-      <div class="card result-card" id="export-container"><div class="result-top"><div><span class="eyebrow">ผลการคำนวณ</span><strong id="res-grand-total">฿0.00</strong></div><span class="result-badge"><span class="material-icons-round">payments</span><b id="res-total-parcel">0</b> ชิ้น</span></div><div class="result-lines"><div><span>รายได้รวม</span><b id="res-gross">฿0.00</b></div><div><span>บ้านซ้ำ</span><b id="res-same">0 ชิ้น</b></div><div><span>กล่อง</span><b id="res-box">0 ชิ้น (฿0.00)</b></div><div><span>งาน RTS</span><b id="res-rts">0 ชิ้น (฿0.00)</b></div><div class="deduction"><span>เงินหักรวม</span><b id="res-deduction">-฿0.00</b></div><div class="net-line"><span>คงเหลือ</span><b id="res-net">฿0.00</b></div></div><div class="breakdown-wrap"><div class="section-heading"><h2>รายละเอียด Tier</h2></div><div class="table-responsive"><table class="table" id="breakdown-table"><thead><tr><th>Tier</th><th>S/ชิ้น</th><th>L/ชิ้น</th><th>เรท</th><th>เงิน</th></tr></thead><tbody id="breakdown-body"><tr><td colspan="5" class="empty-cell">กรอกข้อมูลเพื่อดูรายละเอียด</td></tr></tbody></table></div></div><button class="primary-button" id="btn-save" disabled><span class="material-icons-round">save</span>บันทึกข้อมูล</button></div>
+      <div class="card result-card" id="export-container"><div class="result-top"><div><span class="eyebrow">ผลการคำนวณ</span><strong id="res-grand-total">฿0.00</strong></div><span class="result-badge"><span class="material-icons-round">payments</span><b id="res-total-parcel">0</b> ชิ้น</span></div><div class="result-lines"><div><span>รายได้รวม</span><b id="res-gross">฿0.00</b></div><div><span>บ้านซ้ำ</span><b id="res-same">0 ชิ้น</b></div><div><span>กล่อง</span><b id="res-box">0 ชิ้น (฿0.00)</b></div><div><span>งาน RTS</span><b id="res-rts">0 ชิ้น (฿0.00)</b></div><div class="deduction"><span>เงินหักรวม</span><b id="res-deduction">-฿0.00</b></div><div class="net-line"><span>คงเหลือ</span><b id="res-net">฿0.00</b></div></div><div class="breakdown-wrap"><div class="section-heading"><h2>รายละเอียด Tier</h2></div><div class="table-responsive"><table class="table" id="breakdown-table"><thead><tr><th>Tier</th><th>S/ชิ้น</th><th>L/ชิ้น</th><th>เรท</th><th>เงิน</th></tr></thead><tbody id="breakdown-body"><tr><td colspan="5" class="empty-cell">กรอกข้อมูลเพื่อดูรายละเอียด</td></tr></tbody></table></div></div><button class="primary-button" id="btn-save"><span class="material-icons-round">save</span>บันทึกข้อมูล</button></div>
     </section>
 
     <section id="view-history" class="view-section">
@@ -83,6 +83,24 @@
     <section id="view-payment-details" class="view-section settings-view">
       <div class="page-heading"><button class="icon-button" id="payment-details-back" aria-label="ย้อนกลับ"><span class="material-icons-round">arrow_back</span></button><div><span class="eyebrow">ข้อมูลอ้างอิง</span><h1>รายละเอียดการทำจ่าย</h1></div><span class="material-icons-round page-icon">payments</span></div>
       <div class="card payment-details-card"><h2>ขั้นตอนการทำจ่าย</h2><ol><li>เลือกช่วงวันที่ตามรอบที่ต้องการตรวจสอบ</li><li>ตรวจรายการ 2W/4W และข้อมูล Profile ให้ครบถ้วน</li><li>ตรวจยอด Gross, RTS, บ้านซ้ำ, เงินหัก และ Net</li><li>บันทึกหรือแก้ไขรายการในเครื่องก่อนส่งต่อให้ผู้เกี่ยวข้อง</li></ol><h2>การเตรียมข้อมูล</h2><p class="muted">เตรียมวันที่, ตำแหน่ง, Hub, Zone, จำนวนส่งสำเร็จ, บ้านซ้ำ และ RTS ให้ครบก่อนบันทึก</p><h2>จุดที่ต้องระวัง</h2><p class="muted">หน้านี้เป็นโครงสร้างข้อมูลอ้างอิงของแอป ยังไม่มีการยืนยันหรือสร้างกฎการจ่ายอย่างเป็นทางการเพิ่มเติมจาก Repository</p><div class="info-placeholder"><span class="material-icons-round">info</span><span>TODO: เติมรายละเอียดปฏิบัติการจริงเมื่อมีเอกสารทางการ</span></div></div>
+    </section>
+
+    <section id="view-about" class="view-section settings-view">
+      <div class="page-heading"><button class="icon-button" id="about-back" aria-label="ย้อนกลับ"><span class="material-icons-round">arrow_back</span></button><div><span class="eyebrow">เกี่ยวกับแอป</span><h1>นโยบายความเป็นส่วนตัว</h1></div><span class="material-icons-round page-icon">info</span></div>
+      <div class="card privacy-card"><h2>สิทธิ์การเก็บข้อมูล</h2><p class="muted">ข้อมูลจะถูกเก็บไว้ในเครื่อง เมื่อมีการเปลี่ยนเครื่องมือถือข้อมูลจะไม่ได้ถูก Sync มาด้วย</p></div>
+      <div class="card privacy-card"><p class="muted">Application นี้จัดทำขึ้นเพื่อเป็นประโยชน์กับพนักงาน เพื่อให้ได้คำนวณค่า Incentive คร่าวๆ เท่านั้น ไม่มีเจตนาในการหารายได้ การสนับสนุนนั้นเพื่อเป็นกำลังใจในการพัฒนาแอพฯ</p></div>
+      <div class="section-heading about-section-title"><h2>เกี่ยวกับ Application</h2></div>
+      <div class="card privacy-card"><h2>TBS Incentive</h2><p class="muted">เวอร์ชั่นปัจจุบันของ Application: <b id="about-version">1.5</b></p></div>
+      <div class="card privacy-card"><p class="muted">Powered by #BaNGz</p></div>
+    </section>
+    <section id="view-contact" class="view-section settings-view">
+      <div class="page-heading"><button class="icon-button" id="contact-back" aria-label="ย้อนกลับ"><span class="material-icons-round">arrow_back</span></button><div><span class="eyebrow">ติดต่อผู้พัฒนา</span><h1>ช่องทางการติดต่อ</h1></div><span class="material-icons-round page-icon">contact_support</span></div>
+      <div class="contact-cards">
+        <div class="card contact-card"><span class="contact-icon profile-brand">P</span><div><b>ชื่อผู้พัฒนา</b><p class="muted">ชื่อผู้พัฒนา • #ท้ายบังซิท</p></div></div>
+        <a class="card contact-card" href="https://www.facebook.com/share/1BPpyJH9vs/" target="_blank" rel="noopener"><span class="contact-icon facebook-brand">f</span><div><b>Facebook</b><p class="muted">Bang'Seed Danengniem</p></div><span class="material-icons-round ms-auto">open_in_new</span></a>
+        <a class="card contact-card" href="mailto:bangz.daengnie@gmail.com"><span class="contact-icon email-brand">M</span><div><b>Email</b><p class="muted">bangz.daengnie@gmail.com</p></div><span class="material-icons-round ms-auto">mail</span></a>
+        <div class="card contact-card"><span class="contact-icon warehouse-brand material-icons-round">warehouse</span><div><b>สถานที่ทำงาน</b><p class="muted">ตำแหน่งปัจจุบัน • Hub, Supervisor ABBTG-A (บางบัวทอง A)</p></div></div>
+      </div>
     </section>
 
     <section id="view-support" class="view-section">
