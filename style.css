@@ -232,7 +232,7 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 .payment-detail-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--border);border-radius:14px}
 .payment-detail-switch .segment{min-height:40px}
 .payment-detail-switch .segment.active{background:var(--card);color:var(--color-primary);box-shadow:0 2px 6px rgba(0,0,0,.07)}
-.payment-detail-card{display:grid;gap:16px;padding:16px;margin-bottom:0;min-width:0;width:100%;max-width:100%}
+.payment-detail-card{display:grid;gap:16px;padding:16px;margin-bottom:0;min-width:0;width:100%;max-width:100%}.payment-extra-cards{display:grid;gap:12px;min-width:0}.payment-extra-card{gap:12px}.payment-extra-card .payment-detail-section h2{font-size:16px}
 .payment-page-heading>div{min-width:0;flex:1}.payment-page-heading h1{overflow-wrap:anywhere;word-break:break-word}.payment-page-heading .page-icon{flex:0 0 34px;text-align:right}
 .payment-detail-summary{display:flex;align-items:center;gap:11px;padding-bottom:14px;border-bottom:1px solid var(--border)}
 .payment-detail-summary .payment-info-intro-icon{width:40px;height:40px;flex-basis:40px}
@@ -241,3 +241,24 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 .payment-detail-list{display:grid;gap:7px;min-width:0}.payment-detail-item{display:flex;align-items:flex-start;gap:9px;padding:10px 0;border-bottom:1px solid var(--border);min-width:0}.payment-detail-item:last-child{border-bottom:0;padding-bottom:0}.payment-detail-item>.material-icons-round{flex:0 0 auto;color:var(--color-primary);font-size:19px;margin-top:1px}.payment-detail-item>span:last-child{min-width:0}.payment-detail-item b,.payment-detail-item small{display:block}.payment-detail-item b{font-size:14px;line-height:1.4}.payment-detail-item small{color:var(--muted);font-size:12px;line-height:1.5;margin-top:2px;overflow-wrap:anywhere}
 .payment-detail-empty{display:grid;justify-items:center;gap:6px;text-align:center;padding:28px 16px}.payment-detail-empty>.material-icons-round{font-size:30px;color:var(--color-primary)}.payment-detail-empty h2{font-size:17px}
 @media(max-width:380px){.payment-info-intro{padding:14px;gap:9px}.payment-info-intro-icon{width:38px;height:38px;flex-basis:38px}.payment-cycle-grid,.payment-cutoff-grid{grid-template-columns:1fr}.payment-cycle-card{min-height:116px}.payment-info-row{grid-template-columns:38px minmax(0,1fr) 18px;gap:8px;padding:11px}.payment-topic-icon{width:36px;height:36px}.payment-info-row b{font-size:13px}.payment-detail-card{padding:14px}}
+
+/* Final correction: safe cache/reset controls and confirmation dialog. */
+.settings-leading.cache{color:var(--color-primary);background:var(--color-primary-soft)}.settings-leading.reset{color:var(--danger);background:color-mix(in srgb,var(--danger) 12%,var(--card))}
+.reset-dialog{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px}.reset-dialog.hidden{display:none}.reset-dialog-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.56)}.reset-dialog-card{position:relative;width:min(100%,360px);display:grid;gap:10px;padding:22px;border:1px solid var(--border);border-radius:22px;background:var(--card);color:var(--text);box-shadow:0 18px 50px rgba(15,23,42,.25)}.reset-dialog-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:color-mix(in srgb,var(--danger) 14%,var(--card));color:var(--danger);font-size:24px}.reset-dialog-card h2{font-size:19px;line-height:1.35}.reset-dialog-card p{color:var(--muted);font-size:14px;line-height:1.6}.reset-dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}.reset-dialog-actions button{min-height:46px}.reset-dialog-actions .reset-confirm{background:var(--danger);box-shadow:none}.reset-dialog-actions .reset-confirm:hover{background:color-mix(in srgb,var(--danger) 86%,black)}
+.payment-extra-cards{width:100%;max-width:100%}
+@media(max-width:360px){.reset-dialog{padding:12px}.reset-dialog-card{padding:18px;border-radius:18px}.reset-dialog-actions{gap:8px}.reset-dialog-actions button{font-size:13px;padding-left:8px;padding-right:8px}}
+
+/* Runtime edge-swipe: preserve vertical scrolling while reserving horizontal edge gesture. */
+.app-content{touch-action:pan-y}
+
+/* Final correction: Home payment-cycle indicator and full-artwork Settings banner. */
+.home-payment-cycle{display:flex;align-items:center;gap:9px;margin-top:12px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--color-primary) 24%,var(--border));border-radius:14px;background:var(--color-primary-soft);color:var(--text)}
+.home-payment-cycle.hidden{display:none}
+.home-payment-cycle>.material-icons-round{flex:0 0 auto;color:var(--color-primary);font-size:21px}
+.home-payment-cycle>span:last-child{min-width:0;display:grid;gap:1px}
+.home-payment-cycle small,.home-payment-cycle b{display:block}
+.home-payment-cycle small{color:var(--muted);font-size:11px}
+.home-payment-cycle b{font-size:14px;color:var(--color-primary)}
+.settings-footer.card{padding:0;overflow:hidden}
+.settings-footer.card img{width:100%;height:auto;display:block;aspect-ratio:3 / 1;object-fit:contain}
+@media(min-width:768px){.payment-cycle-grid,.payment-cutoff-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}

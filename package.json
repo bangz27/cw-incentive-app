@@ -17,10 +17,12 @@
     "android:release": "npm run cap:sync && node scripts/gradle.cjs assembleRelease",
     "android:aab": "npm run cap:sync && node scripts/gradle.cjs bundleRelease",
     "android:open": "cap open android",
-    "verify:platform": "node validation/platform-check.cjs"
+    "verify:platform": "node validation/platform-check.cjs",
+    "verify:update": "node scripts/verify-update.cjs"
   },
   "dependencies": {
     "@capacitor/android": "7.6.9",
+    "@capacitor/app": "7.1.2",
     "@capacitor/camera": "^7.0.2",
     "@capacitor/core": "7.6.9",
     "@capacitor/local-notifications": "^7.0.3"
