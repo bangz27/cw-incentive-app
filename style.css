@@ -195,3 +195,49 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 #view-calculator .calculator-form-card .field-label-text{display:inline-block;position:relative;top:2px}
 #view-calculator .calculator-form-card .field input,
 #view-calculator .calculator-form-card .field select{padding-top:2px}
+
+
+/* Payment details: static informational UI in the existing Settings language. */
+.payment-info-page,.payment-detail-content{display:grid;gap:16px;min-width:0}
+.payment-info-section{display:grid;gap:10px;min-width:0}
+.payment-info-section .section-heading{margin-bottom:0}
+.payment-info-section .section-heading h2{display:flex;align-items:center;gap:7px}
+.payment-info-section .section-heading .material-icons-round{color:var(--color-primary);font-size:20px}
+.payment-info-intro{display:flex;align-items:flex-start;gap:12px;margin-bottom:0;padding:16px;border-color:color-mix(in srgb,var(--color-primary) 20%,var(--border));background:var(--color-primary-soft);box-shadow:none}
+.payment-info-intro-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;background:var(--color-primary);color:#fff;font-size:22px}
+.payment-info-intro h2{margin-bottom:3px;font-size:18px}
+.payment-info-intro p{line-height:1.55}
+.payment-cycle-grid,.payment-cutoff-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
+.payment-cycle-card,.payment-cutoff-card,.payment-info-row{font:inherit;text-align:left;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:15px;min-width:0;cursor:pointer}
+.payment-cycle-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-height:136px;padding:15px}
+.payment-cycle-card:hover,.payment-cutoff-card:hover,.payment-info-row:hover{border-color:var(--color-primary)}
+.payment-card-icon{color:var(--color-primary);font-size:25px;margin-bottom:4px}
+.payment-card-label{font-weight:600}
+.payment-cycle-card strong{font-size:18px;color:var(--color-primary)}
+.payment-cycle-card small,.payment-cutoff-card small,.payment-info-row small{display:block;color:var(--muted);font-size:12px;line-height:1.45}
+.payment-chevron{position:absolute;right:12px;bottom:12px;color:var(--muted);font-size:20px}
+.payment-cutoff-card{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px}
+.payment-cutoff-card>span:first-child{min-width:0}
+.payment-cutoff-card b{display:block;font-size:13px;margin-bottom:3px}
+.payment-cutoff-card>.material-icons-round{flex:0 0 auto;color:var(--muted)}
+.payment-info-list{display:grid;gap:9px;min-width:0}
+.payment-info-row{display:grid;grid-template-columns:42px minmax(0,1fr) 20px;align-items:center;gap:10px;padding:12px 13px}
+.payment-info-row>span:nth-child(2){min-width:0}
+.payment-info-row b{display:block;font-size:14px;margin-bottom:2px;overflow-wrap:anywhere}
+.payment-info-row>.material-icons-round:last-child{color:var(--muted);font-size:20px}
+.payment-topic-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;font-size:21px}
+.payment-topic-icon.parcels{background:#FEF3C7;color:#D97706}.payment-topic-icon.calls{background:#DBEAFE;color:#2563EB}.payment-topic-icon.attendance{background:#FDE68A;color:#A16207}.payment-topic-icon.extra{background:#D1FAE5;color:#047857}.payment-topic-icon.deductions{background:#FEE2E2;color:#DC2626}
+.payment-info-disclaimer{display:flex;align-items:flex-start;gap:7px;margin:0 2px 8px;color:var(--muted);font-size:12px;line-height:1.55}
+.payment-info-disclaimer>.material-icons-round{flex:0 0 auto;color:var(--color-primary);font-size:18px}
+.payment-detail-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--border);border-radius:14px}
+.payment-detail-switch .segment{min-height:40px}
+.payment-detail-switch .segment.active{background:var(--card);color:var(--color-primary);box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.payment-detail-card{display:grid;gap:16px;padding:16px;margin-bottom:0;min-width:0;width:100%;max-width:100%}
+.payment-page-heading>div{min-width:0;flex:1}.payment-page-heading h1{overflow-wrap:anywhere;word-break:break-word}.payment-page-heading .page-icon{flex:0 0 34px;text-align:right}
+.payment-detail-summary{display:flex;align-items:center;gap:11px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.payment-detail-summary .payment-info-intro-icon{width:40px;height:40px;flex-basis:40px}
+.payment-detail-summary b,.payment-detail-summary small{display:block}.payment-detail-summary small{color:var(--muted);font-size:12px;margin-top:2px}
+.payment-detail-section{display:grid;gap:9px;min-width:0}.payment-detail-section h2{display:flex;align-items:center;gap:7px;font-size:16px}.payment-detail-section h2>.material-icons-round{font-size:20px;color:var(--color-primary)}
+.payment-detail-list{display:grid;gap:7px;min-width:0}.payment-detail-item{display:flex;align-items:flex-start;gap:9px;padding:10px 0;border-bottom:1px solid var(--border);min-width:0}.payment-detail-item:last-child{border-bottom:0;padding-bottom:0}.payment-detail-item>.material-icons-round{flex:0 0 auto;color:var(--color-primary);font-size:19px;margin-top:1px}.payment-detail-item>span:last-child{min-width:0}.payment-detail-item b,.payment-detail-item small{display:block}.payment-detail-item b{font-size:14px;line-height:1.4}.payment-detail-item small{color:var(--muted);font-size:12px;line-height:1.5;margin-top:2px;overflow-wrap:anywhere}
+.payment-detail-empty{display:grid;justify-items:center;gap:6px;text-align:center;padding:28px 16px}.payment-detail-empty>.material-icons-round{font-size:30px;color:var(--color-primary)}.payment-detail-empty h2{font-size:17px}
+@media(max-width:380px){.payment-info-intro{padding:14px;gap:9px}.payment-info-intro-icon{width:38px;height:38px;flex-basis:38px}.payment-cycle-grid,.payment-cutoff-grid{grid-template-columns:1fr}.payment-cycle-card{min-height:116px}.payment-info-row{grid-template-columns:38px minmax(0,1fr) 18px;gap:8px;padding:11px}.payment-topic-icon{width:36px;height:36px}.payment-info-row b{font-size:13px}.payment-detail-card{padding:14px}}

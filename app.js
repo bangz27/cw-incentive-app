@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.toggle('active', v.id === safeTarget));
     document.querySelector('.app-shell')?.classList.toggle('calculator-fixed-layer', safeTarget === 'view-calculator');
     document.querySelectorAll('[data-target]').forEach(n => n.classList.toggle('active', n.dataset.target === safeTarget && n.classList.contains('nav-item')));
-    const contexts = {'view-home':['TBS Incentive','สรุปรายได้ของคุณ'],'view-calculator':['TBS Incentive','เลือกตำแหน่งจัดส่ง'],'view-profile':['TBS Incentive','Profile • ข้อมูลของฉัน'],'view-history':['TBS Incentive','รายการ • ประวัติคำนวณ'],'view-settings':['TBS Incentive','Setting • ตั้งค่าและข้อมูลเพิ่มเติม'],'view-guide':['TBS Incentive','คู่มือการใช้งาน'],'view-payment-details':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-support':['TBS Incentive','สนับสนุนค่ากาแฟ'],'view-about':['TBS Incentive','นโยบายความเป็นส่วนตัว'],'view-contact':['TBS Incentive','ข้อมูลการติดต่อ']};
+    const contexts = {'view-home':['TBS Incentive','สรุปรายได้ของคุณ'],'view-calculator':['TBS Incentive','เลือกตำแหน่งจัดส่ง'],'view-profile':['TBS Incentive','Profile • ข้อมูลของฉัน'],'view-history':['TBS Incentive','รายการ • ประวัติคำนวณ'],'view-settings':['TBS Incentive','Setting • ตั้งค่าและข้อมูลเพิ่มเติม'],'view-guide':['TBS Incentive','คู่มือการใช้งาน'],'view-payment-details':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-payment-detail':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-support':['TBS Incentive','สนับสนุนค่ากาแฟ'],'view-about':['TBS Incentive','นโยบายความเป็นส่วนตัว'],'view-contact':['TBS Incentive','ข้อมูลการติดต่อ']};
     const context = contexts[safeTarget] || contexts['view-home'];
     const title = document.getElementById('header-title'), subtitle = document.getElementById('header-subtitle'), refresh = document.getElementById('header-refresh');
     if (title) title.textContent = context[0]; if (subtitle) subtitle.textContent = context[1]; refresh?.classList.toggle('hidden', safeTarget !== 'view-calculator');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.querySelectorAll('[data-target]').forEach(link => link.addEventListener('click', e => { e.preventDefault(); if (link.dataset.vehicle) window.dispatchEvent(new CustomEvent('vehicleSelected', { detail: link.dataset.vehicle })); showView(link.dataset.target); }));
   window.addEventListener('showView', e => showView(e.detail));
-  let edgeSwipe = null; document.addEventListener('touchstart', e => { const t=e.touches?.[0]; const active=document.querySelector('.view-section.active')?.id; if(!t || t.clientX>28 || !['view-guide','view-payment-details','view-support','view-about','view-contact'].includes(active)) { edgeSwipe=null; return; } edgeSwipe={x:t.clientX,y:t.clientY}; }, { passive:true }); document.addEventListener('touchmove', e => { if(!edgeSwipe) return; const t=e.touches?.[0]; if(!t) return; const dx=t.clientX-edgeSwipe.x, dy=Math.abs(t.clientY-edgeSwipe.y); if(dx>12 && dx>dy) { e.preventDefault(); edgeSwipe.horizontal=true; } }, { passive:false }); document.addEventListener('touchend', e => { const t=e.changedTouches?.[0]; if(edgeSwipe && t && edgeSwipe.horizontal && t.clientX-edgeSwipe.x>=72 && Math.abs(t.clientY-edgeSwipe.y)<80) showView('view-settings'); edgeSwipe=null; }, { passive:true }); document.addEventListener('touchcancel',()=>{edgeSwipe=null;},{passive:true});
+  let edgeSwipe = null; document.addEventListener('touchstart', e => { const t=e.touches?.[0]; const active=document.querySelector('.view-section.active')?.id; if(!t || t.clientX>28 || !['view-guide','view-payment-details','view-payment-detail','view-support','view-about','view-contact'].includes(active)) { edgeSwipe=null; return; } edgeSwipe={x:t.clientX,y:t.clientY,active}; }, { passive:true }); document.addEventListener('touchmove', e => { if(!edgeSwipe) return; const t=e.touches?.[0]; if(!t) return; const dx=t.clientX-edgeSwipe.x, dy=Math.abs(t.clientY-edgeSwipe.y); if(dx>12 && dx>dy) { e.preventDefault(); edgeSwipe.horizontal=true; } }, { passive:false }); document.addEventListener('touchend', e => { const t=e.changedTouches?.[0]; if(edgeSwipe && t && edgeSwipe.horizontal && t.clientX-edgeSwipe.x>=72 && Math.abs(t.clientY-edgeSwipe.y)<80) showView(edgeSwipe.active === 'view-payment-detail' ? 'view-payment-details' : 'view-settings'); edgeSwipe=null; }, { passive:true }); document.addEventListener('touchcancel',()=>{edgeSwipe=null;},{passive:true});
 
   function fillForm(p) { [['profile-name', 'fullName'], ['profile-hub', 'hub'], ['profile-position', 'position']].forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.value = p?.[key] || ''; }); }
   function renderProfile() { const p = current(), name = p.fullName || p.displayName || ''; const greeting = document.getElementById('home-greeting'); if (greeting) greeting.textContent = name ? `สวัสดี, ${name}` : 'เริ่มคำนวณรายได้ของคุณ'; document.querySelectorAll('#home-avatar,#profile-avatar').forEach(x => setAvatar(x, p)); const preview = document.getElementById('profile-preview-name'); if (preview) preview.textContent = name || 'ยังไม่ได้สร้างโปรไฟล์'; fillForm(p); }
@@ -111,6 +111,52 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   document.getElementById('profile-avatar-button')?.addEventListener('click', choosePhoto); document.getElementById('profile-photo-change')?.addEventListener('click', choosePhoto); document.getElementById('profile-photo-camera')?.addEventListener('click', chooseCamera); photoInput?.addEventListener('change', () => savePhotoFile(photoInput)); cameraInput?.addEventListener('change', () => savePhotoFile(cameraInput));
   document.getElementById('profile-photo-remove')?.addEventListener('click', () => { const p = current(); if (p.profileId) profiles.save({ ...p, customPhoto: '' }, p.profileId); renderProfile(); });
+  const paymentSection = (title, items, icon = 'check_circle') => `<section class="payment-detail-section"><h2><span class="material-icons-round">${icon}</span>${title}</h2><div class="payment-detail-list">${items.map(item => `<div class="payment-detail-item"><span class="material-icons-round">${item[0] || 'check'}</span><span><b>${item[1]}</b>${item[2] ? `<small>${item[2]}</small>` : ''}</span></div>`).join('')}</div></section>`;
+  const paymentDetailTitle = { payday15: 'วันที่ 15', monthEnd: 'รอบจ่ายสิ้นเดือน (1H)', parcelRate: 'ค่ากล่อง/ส่งสำเร็จ', callBonus: 'เงินรางวัลโทรหาลูกค้า', attendanceBonus: 'เงินรางวัลอัตราการเข้างาน', extra: 'เงินตอบแทนพิเศษ', deductions: 'รายการหัก' };
+  let paymentDetailKey = 'payday15', paymentDetailVehicle = '2W';
+  function paymentVehicleSwitch(kind) { return `<div class="payment-detail-switch" role="tablist" aria-label="เลือกประเภทรถ"><button type="button" class="segment ${paymentDetailVehicle === '2W' ? 'active' : ''}" data-payment-segment="2W">2W</button><button type="button" class="segment ${paymentDetailVehicle === '4W' ? 'active' : ''}" data-payment-segment="4W">4W</button></div>`; }
+  function renderPaymentDetail(kind = paymentDetailKey) {
+    paymentDetailKey = kind;
+    const title = document.getElementById('payment-detail-title'), content = document.getElementById('payment-detail-content');
+    if (!title || !content) return;
+    title.textContent = paymentDetailTitle[kind] || 'รายละเอียด';
+    let body = '', hasSwitch = false;
+    if (kind === 'payday15' || kind === 'monthEnd') {
+      const isPayday = kind === 'payday15';
+      if (!isPayday && paymentDetailVehicle === '2W') {
+        body = `<div class="card payment-detail-empty"><span class="material-icons-round">info</span><h2>2W</h2><p class="muted">ไม่มีรายการ Incentive ตามตารางนี้</p></div>`;
+      } else {
+        const items = isPayday ? [
+          ['inventory_2', 'ค่ากล่อง/ส่งสำเร็จ', 'คิดตามจำนวนพัสดุส่งสำเร็จและอัตราของแต่ละ Zone'],
+          ['phone_in_talk', 'เงินรางวัลโทรหาลูกค้า', '500 บาท/เดือน'],
+          ['emoji_events', 'เงินรางวัลอัตราการเข้างาน', '1,000 บาท/เดือน'],
+          ['bolt', 'Extra', 'เงินตอบแทนพิเศษตามเงื่อนไข'],
+          ...(paymentDetailVehicle === '4W' ? [['local_shipping', 'Incentive 4W Own Fleet', 'ข้อมูลสำหรับศึกษาเท่านั้น']] : []),
+          ['remove_circle_outline', 'รายการหัก', 'COD / พัสดุสูญหาย / PoD-POOH']
+        ] : [
+          ['inventory_2', 'ค่ากล่อง/ส่งสำเร็จ', 'คิดตามจำนวนพัสดุส่งสำเร็จ'],
+          ['bolt', 'Extra', 'เงินตอบแทนพิเศษตามเงื่อนไข'],
+          ['remove_circle_outline', 'รายการหัก', 'COD / พัสดุสูญหาย / PoD-POOH']
+        ];
+        body = `<div class="card payment-detail-card"><div class="payment-detail-summary"><span class="payment-info-intro-icon material-icons-round">${isPayday ? 'event' : 'event_available'}</span><div><span class="eyebrow">${isPayday ? '2W / 4W' : '4W'}</span><b>${isPayday ? 'วันที่ 15' : 'รอบจ่ายสิ้นเดือน (1H)'}</b><small>${isPayday ? 'วันที่ 11 เดือนก่อน → วันที่ 25 เดือนก่อน' : 'วันที่ 26 เดือนก่อน → วันที่ 10 เดือนปัจจุบัน'}</small></div></div>${paymentSection(paymentDetailVehicle === '4W' ? 'รายละเอียด 4W' : 'รายละเอียด 2W', items)}</div>`;
+      }
+      hasSwitch = true;
+    } else if (kind === 'parcelRate') {
+      body = `<div class="card payment-detail-card">${paymentSection('โครงสร้างการจ่าย', [['inventory_2', 'คิดตามจำนวนพัสดุส่งสำเร็จ', 'จำนวนพัสดุที่ส่งสำเร็จเป็นข้อมูลหลักของการจ่าย'], ['map', 'อัตราขึ้นกับ Zone Z1–Z16', 'ตรวจสอบอัตราตาม Zone ของรายการ'], ['two_wheeler', 'แยกตาม 2W / 4W / Own Fleet', 'ข้อมูลนี้เป็นคำอธิบาย ไม่แก้ Calculation Engine เดิม']])}</div>`;
+    } else if (kind === 'callBonus') {
+      body = `<div class="card payment-detail-card">${paymentSection('เงื่อนไขเงินรางวัล', [['payments', '500 บาท/เดือน', 'เงินรางวัลโทรหาลูกค้า'], ['phone_in_talk', 'โทรก่อนจัดส่ง ≥95%', 'สัดส่วนการโทรต้องเป็นไปตามเงื่อนไข'], ['podcasts', 'ต้องโทรผ่านระบบ POD', 'ใช้ข้อมูลจากระบบ POD เป็นหลัก'], ['date_range', 'มีเงื่อนไข Pro-rate', 'กรณีทำงานไม่ครบเดือน']])}</div>`;
+    } else if (kind === 'attendanceBonus') {
+      body = `<div class="card payment-detail-card">${paymentSection('เงื่อนไขเงินรางวัล', [['payments', '1,000 บาท/เดือน', 'เงินรางวัลอัตราการเข้างาน'], ['event_available', 'ไม่ขาดงาน / ไม่มาสาย / ไม่ลา', 'ต้องรักษาเงื่อนไขการทำงานครบถ้วน'], ['verified', 'Attendance 100%', 'อัตราการเข้างานเต็มตามเงื่อนไข'], ['sentiment_satisfied', 'ไม่มีข้อร้องเรียนจากลูกค้า', 'พิจารณาตามเงื่อนไขที่เกี่ยวข้อง'], ['schedule', 'คืน COD ภายใน 23:00 น.', 'ปฏิบัติตามเวลาที่กำหนด']])}</div>`;
+    } else if (kind === 'extra') {
+      body = `<div class="card payment-detail-card">${paymentSection('First-Mile / งานรีเทิร์น', [['inventory_2', 'จำนวนกล่อง × 1.50 บาท', 'คำนวณตามจำนวนกล่องที่เข้าเงื่อนไข']])}${paymentSection('Buyer Return (RR)', [['replay', 'จำนวนกล่องต่อวัน × Rate ตัวแรกของ Zone Incentive']])}${paymentSection('🚚 ค่าวิ่งไกล', [['local_shipping', 'สอบถามเรทจาก Hub, Supervisor']])}</div>`;
+    } else if (kind === 'deductions') {
+      body = `<div class="card payment-detail-card">${paymentSection('รายการที่อาจถูกหัก', [['payments', 'COD', 'รายการที่เกี่ยวข้องกับการคืนหรือโอน COD'], ['inventory_2', 'พัสดุสูญหาย', 'ตรวจสอบตามเงื่อนไขที่เกี่ยวข้อง'], ['report_problem', 'PoD / POOH Penalty', 'รายการหักตามเงื่อนไข'], ['remove_circle_outline', 'Penalty อื่นตามเงื่อนไข', 'ศึกษาจากเอกสารหรือประกาศที่เกี่ยวข้อง']])}</div>`;
+    }
+    content.innerHTML = `${hasSwitch ? paymentVehicleSwitch(kind) : ''}${body}<p class="payment-info-disclaimer"><span class="material-icons-round">info</span><span>ข้อมูลนี้เป็น Static Information สำหรับศึกษาเท่านั้น ไม่ได้เพิ่มการคำนวณรายการหักหรือ Payroll อัตโนมัติ</span></p>`;
+    content.querySelectorAll('[data-payment-segment]').forEach(button => button.addEventListener('click', () => { paymentDetailVehicle = button.dataset.paymentSegment; renderPaymentDetail(paymentDetailKey); }));
+  }
+  document.querySelectorAll('[data-payment-detail]').forEach(button => button.addEventListener('click', () => { paymentDetailVehicle = '2W'; showView('view-payment-detail'); renderPaymentDetail(button.dataset.paymentDetail); }));
+  document.getElementById('payment-detail-back')?.addEventListener('click', () => showView('view-payment-details'));
   document.getElementById('check-updates')?.addEventListener('click', () => checkForUpdates(true)); document.getElementById('profile-manual')?.addEventListener('click', () => showView('view-guide')); document.getElementById('guide-back')?.addEventListener('click', () => showView('view-settings')); document.getElementById('profile-contact')?.addEventListener('click', () => showView('view-contact')); document.getElementById('contact-back')?.addEventListener('click', () => showView('view-settings')); document.getElementById('profile-about')?.addEventListener('click', () => showView('view-about')); document.getElementById('about-back')?.addEventListener('click', () => showView('view-settings')); document.getElementById('header-refresh')?.addEventListener('click', () => document.getElementById('btn-reset')?.click());
   document.getElementById('profile-payment-details')?.addEventListener('click', () => showView('view-payment-details')); document.getElementById('payment-details-back')?.addEventListener('click', () => showView('view-settings'));
   document.getElementById('profile-share')?.addEventListener('click', async () => { const url = 'https://github.com/bangz27/cw-incentive-app/releases/download/v1.5/TBS-Incentive-v1.5.apk'; const title = 'TBS Incentive'; const text = 'ลิงก์ดาวน์โหลด Production จะพร้อมใช้งานเมื่อ Signed APK ถูกเผยแพร่'; if (!url) { showToast('ลิงก์ดาวน์โหลด Production ยังไม่พร้อมใช้งาน'); return; } try { if (typeof navigator.share === 'function') { await navigator.share({ title, text, url }); return; } } catch (error) { if (error?.name === 'AbortError') return; } const message = `${title}\n${text}\n${url}`; try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(message); showToast('คัดลอกลิงก์ดาวน์โหลดแล้ว'); return; } } catch (error) { /* Continue to the browser fallback. */ } window.open(url, '_blank', 'noopener,noreferrer'); });
