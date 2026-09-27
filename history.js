@@ -39,10 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
     ['calc-date', 'calc-zone', 'calc-parcel', 'calc-size-s', 'calc-size-l', 'calc-same-address', 'calc-rts'].forEach(id => document.getElementById(id)?.dispatchEvent(new Event('input', { bubbles: true })));
     window.dispatchEvent(new CustomEvent('showView', { detail: 'view-calculator' }));
   }
-  function deleteRecord(id) {
+  async function deleteRecord(id) {
     const rows = rawRows();
-    if (!rows.some(r => String(r.id) === String(id))) return;
+    const target = rows.find(r => String(r.id) === String(id));
+    if (!target) return;
+    const currentUserId = window.TBSUserStorage?.getUserId?.();
+    if (target.user_id && String(target.user_id) !== String(currentUserId)) return;
     if (!confirm('ต้องการลบรายการนี้หรือไม่? ข้อมูลรายการอื่นจะไม่ถูกเปลี่ยนแปลง')) return;
+    const result = await window.TBSSupabaseAuth?.deleteRecord?.(id);
+    if (!result?.ok) {
+      if (!result?.aborted) window.TBSShowToast?.('ลบรายการไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+      return;
+    }
     userStorage()?.setItem('history', JSON.stringify(rows.filter(r => String(r.id) !== String(id))));
     load();
     window.dispatchEvent(new Event('historyUpdated'));

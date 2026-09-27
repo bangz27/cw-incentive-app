@@ -67,23 +67,64 @@
   }
 
   async function syncRecords() {
-    if (!authState.user || !authState.client || authState.syncing || storage()?.getUserId() !== authState.user.id) return;
+    const syncUserId = authState.user?.id;
+    const syncStorageUserId = storage()?.getUserId();
+    const syncAccessToken = authState.session?.access_token || null;
+    const ownsSync = () => Boolean(
+      syncUserId &&
+      authState.user?.id === syncUserId &&
+      storage()?.getUserId() === syncUserId &&
+      (!syncAccessToken || authState.session?.access_token === syncAccessToken)
+    );
+    if (!syncUserId || !authState.client || syncStorageUserId !== syncUserId || !ownsSync()) return;
+    if (authState.syncing && authState.syncingUserId === syncUserId) return;
     authState.syncing = true;
+    authState.syncingUserId = syncUserId;
     try {
-      const local = localRecords();
+      if (!ownsSync()) return;
+      const local = localRecords().filter(row => !row?.user_id || String(row.user_id) === String(syncUserId));
       if (local.length) {
-        const rows = local.map(row => cloudRecord(authState.user.id, row));
+        const rows = local.map(row => cloudRecord(syncUserId, row));
         const { error } = await authState.client.from('incentive_records').upsert(rows, { onConflict: 'user_id,record_id' });
+        if (!ownsSync()) return;
         if (error) console.warn('Supabase record sync skipped:', error.message);
       }
-      const { data, error } = await authState.client.from('incentive_records').select('record_id,date,full_name,hub,driver_id,vehicle_type,zone,parcel,size_s,size_l,gross_incentive,same_address_count,same_address_deduction,net_incentive,tier_breakdown,rts_count,rts_income,box_count,box_amount').eq('user_id', authState.user.id).order('date', { ascending: false }).limit(500);
-      if (!error && Array.isArray(data) && storage()?.getUserId() === authState.user.id) {
+      if (!ownsSync()) return;
+      const { data, error } = await authState.client.from('incentive_records').select('record_id,date,full_name,hub,driver_id,vehicle_type,zone,parcel,size_s,size_l,gross_incentive,same_address_count,same_address_deduction,net_incentive,tier_breakdown,rts_count,rts_income,box_count,box_amount').eq('user_id', syncUserId).order('date', { ascending: false }).limit(500);
+      if (!ownsSync()) return;
+      if (!error && Array.isArray(data)) {
         const merged = new Map(local.map(row => [String(row.id || row.recordId), row]));
-        data.forEach(row => { if (!merged.has(String(row.record_id))) merged.set(String(row.record_id), localRecord(row)); });
+        data.forEach(row => { if (String(row.user_id || syncUserId) !== String(syncUserId)) return; if (!merged.has(String(row.record_id))) merged.set(String(row.record_id), localRecord(row)); });
+        if (!ownsSync()) return;
         storage().setItem('history', JSON.stringify([...merged.values()]));
         global.dispatchEvent(new Event('historyUpdated'));
       }
-    } finally { authState.syncing = false; }
+    } finally {
+      if (authState.syncingUserId === syncUserId) {
+        authState.syncing = false;
+        authState.syncingUserId = null;
+      }
+    }
+  }
+
+  async function deleteRecord(recordId) {
+    const deleteUserId = authState.user?.id;
+    const deleteStorageUserId = storage()?.getUserId();
+    const deleteAccessToken = authState.session?.access_token || null;
+    const ownsDelete = () => Boolean(
+      deleteUserId &&
+      authState.user?.id === deleteUserId &&
+      storage()?.getUserId() === deleteUserId &&
+      (!deleteAccessToken || authState.session?.access_token === deleteAccessToken)
+    );
+    if (!deleteUserId || deleteStorageUserId !== deleteUserId || !authState.client || !ownsDelete()) return { ok: false, aborted: true };
+    const { error } = await authState.client.from('incentive_records')
+      .delete()
+      .eq('user_id', deleteUserId)
+      .eq('record_id', String(recordId));
+    if (!ownsDelete()) return { ok: false, aborted: true };
+    if (error) return { ok: false, error };
+    return { ok: true };
   }
 
   function setAuthenticated(user, session = null) {
@@ -150,6 +191,6 @@
     global.addEventListener('activeProfileChanged', () => syncProfile().catch(() => {}));
     global.addEventListener('historyUpdated', () => syncRecords().catch(() => {}));
   }
-  global.TBSSupabaseAuth = { init, signIn, signUp, resetPassword, signOut, getUser: () => authState.user, getClient: () => authState.client, syncProfile, restoreProfileFromCloud, syncRecords };
+  global.TBSSupabaseAuth = { init, signIn, signUp, resetPassword, signOut, getUser: () => authState.user, getClient: () => authState.client, syncProfile, restoreProfileFromCloud, syncRecords, deleteRecord };
   document.addEventListener('DOMContentLoaded', () => { bindUi(); init(); });
 })(window);
