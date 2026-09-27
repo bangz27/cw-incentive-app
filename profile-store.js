@@ -1,11 +1,12 @@
-/* TBS Incentive local profile store. No network or Firebase credentials are used here. */
+/* TBS Incentive user-scoped local profile store. */
 (function (global) {
-  const PROFILES_KEY = 'cw_profiles';
-  const ACTIVE_KEY = 'cw_active_profile_id';
-  const LEGACY_KEY = 'cw_profile';
+  const storage = () => global.TBSUserStorage;
+  const PROFILES_KEY = 'profiles';
+  const ACTIVE_KEY = 'active-profile-id';
+  const LEGACY_KEY = 'profile';
   const now = () => new Date().toISOString();
-  const readJson = (key, fallback) => { try { const value = JSON.parse(localStorage.getItem(key)); return value ?? fallback; } catch { return fallback; } };
-  const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const readJson = (key, fallback) => storage()?.getJson(key, fallback) ?? fallback;
+  const write = (key, value) => storage()?.setJson(key, value);
   const id = () => `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const normalize = (raw = {}) => {
     const createdAt = raw.createdAt || now();
@@ -18,43 +19,47 @@
     };
   };
   function migrate() {
+    if (!storage()?.getUserId()) return [];
     let profiles = readJson(PROFILES_KEY, null);
-    if (!Array.isArray(profiles)) {
-      const legacy = readJson(LEGACY_KEY, null);
-      profiles = legacy && Object.keys(legacy).length ? [normalize(legacy)] : [];
-      if (profiles.length) write(PROFILES_KEY, profiles);
-    }
+    if (!Array.isArray(profiles)) profiles = [];
     profiles = profiles.map(normalize);
-    let activeId = localStorage.getItem(ACTIVE_KEY);
+    let activeId = storage().getItem(ACTIVE_KEY);
     if (!activeId || !profiles.some(p => p.profileId === activeId)) activeId = profiles[0]?.profileId || '';
+    profiles = profiles.map(profile => ({ ...profile, isActive: profile.profileId === activeId }));
     write(PROFILES_KEY, profiles);
-    if (activeId) localStorage.setItem(ACTIVE_KEY, activeId); else localStorage.removeItem(ACTIVE_KEY);
+    if (activeId) storage().setItem(ACTIVE_KEY, activeId); else storage().removeItem(ACTIVE_KEY);
     return profiles;
   }
   function all() { return migrate(); }
-  function active() { const profiles = all(); const activeId = localStorage.getItem(ACTIVE_KEY); return profiles.find(p => p.profileId === activeId) || null; }
+  function active() { const profiles = all(); const activeId = storage()?.getItem(ACTIVE_KEY); return profiles.find(p => p.profileId === activeId) || null; }
   function save(input, profileId) {
+    if (!storage()?.getUserId()) return null;
     const profiles = all(); const existing = profiles.find(p => p.profileId === profileId);
     const profile = normalize({ ...(existing || {}), ...input, profileId: profileId || existing?.profileId || id(), updatedAt: now() });
     const next = existing ? profiles.map(p => p.profileId === profile.profileId ? profile : p) : [...profiles, profile];
     write(PROFILES_KEY, next); setActive(profile.profileId); return profile;
   }
   function setActive(profileId) {
+    if (!storage()?.getUserId()) return null;
     const profiles = all(); if (!profiles.some(p => p.profileId === profileId)) return null;
     write(PROFILES_KEY, profiles.map(p => ({ ...p, isActive: p.profileId === profileId })));
-    localStorage.setItem(ACTIVE_KEY, profileId);
-    // Keep legacy key as a compatibility mirror; existing records are untouched.
+    storage().setItem(ACTIVE_KEY, profileId);
     const selected = profiles.find(p => p.profileId === profileId);
     write(LEGACY_KEY, selected || {});
     global.dispatchEvent(new CustomEvent('activeProfileChanged', { detail: selected }));
     return selected;
   }
   function remove(profileId) {
-    const profiles = all(); const next = profiles.filter(p => p.profileId !== profileId); if (next.length) write(PROFILES_KEY, next); else localStorage.removeItem(PROFILES_KEY);
-    if (localStorage.getItem(ACTIVE_KEY) === profileId) { const replacement = next[0]; if (replacement) setActive(replacement.profileId); else { localStorage.removeItem(ACTIVE_KEY); write(LEGACY_KEY, {}); global.dispatchEvent(new CustomEvent('activeProfileChanged', { detail: null })); } }
+    if (!storage()?.getUserId()) return [];
+    const profiles = all(); const next = profiles.filter(p => p.profileId !== profileId);
+    if (next.length) write(PROFILES_KEY, next); else storage().removeItem(PROFILES_KEY);
+    if (storage().getItem(ACTIVE_KEY) === profileId) {
+      const replacement = next[0];
+      if (replacement) setActive(replacement.profileId);
+      else { storage().removeItem(ACTIVE_KEY); write(LEGACY_KEY, {}); global.dispatchEvent(new CustomEvent('activeProfileChanged', { detail: null })); }
+    }
     return next;
   }
   function photo(profile) { return profile?.customPhoto || profile?.photoURL || ''; }
   global.TBSProfiles = { all, getActive: active, save, setActive, remove, photo, keys: { PROFILES_KEY, ACTIVE_KEY, LEGACY_KEY } };
-  migrate();
 })(window);

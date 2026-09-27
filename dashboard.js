@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ฟังก์ชันหลักสำหรับอัปเดตหน้า Dashboard ทั้งหมด
     function updateDashboard() {
-        const history = window.CWRecordModel ? window.CWRecordModel.readRecords(localStorage) : [];
+        const scopedStorage = window.TBSUserStorage?.storage;
+        const history = scopedStorage && window.CWRecordModel ? window.CWRecordModel.readRecords(scopedStorage) : [];
 
         updateSummaryCards(history);
         updateCharts(history);
@@ -156,4 +157,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // ดักฟัง Event 'historyUpdated' ที่เราเขียนปล่อยมาจากไฟล์ history.js
     // เพื่อให้อัปเดตกราฟแบบ Real-time เวลาผู้ใช้กดเซฟการคำนวณใหม่
     window.addEventListener('historyUpdated', updateDashboard);
+    window.addEventListener('userStorageReady', updateDashboard);
 });

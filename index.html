@@ -27,6 +27,13 @@
       <p id="auth-message" class="auth-message hidden" role="alert"></p><small class="auth-footer">TBS Solutions</small>
     </div>
   </section>
+  <div id="legacy-migration-dialog" class="auth-modal hidden" role="dialog" aria-modal="true" aria-labelledby="legacy-migration-title">
+    <div class="auth-card migration-card">
+      <h2 id="legacy-migration-title">พบข้อมูลเดิมในเครื่อง</h2>
+      <p>ต้องการนำเข้าข้อมูลเดิมเป็นข้อมูลของบัญชีนี้หรือไม่?</p>
+      <div class="auth-links migration-actions"><button type="button" class="text-button" id="legacy-skip">ข้าม</button><button type="button" class="primary-button" id="legacy-import">นำเข้าข้อมูลเดิม</button></div>
+    </div>
+  </div>
 <div class="app-shell auth-hidden">
   <header class="app-header">
     <div class="brand-lockup">
@@ -135,6 +142,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div><nav class="bottom-nav"><button class="nav-item active" data-target="view-home"><span class="material-icons-round">home</span><span>หน้าหลัก</span></button><button class="nav-item" data-target="view-calculator"><span class="material-icons-round">calculate</span><span>คำนวณ</span></button><button class="nav-item" data-target="view-profile"><span class="material-icons-round">person</span><span>โปรไฟล์</span></button><button class="nav-item" data-target="view-history"><span class="material-icons-round">receipt_long</span><span>รายการ</span></button><button class="nav-item" data-target="view-settings"><span class="material-icons-round">settings</span><span>ตั้งค่า</span></button></nav>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="capacitor-core.js"></script><script src="capacitor-app.js"></script><script src="capacitor-local-notifications.js"></script><script src="capacitor-camera.js"></script><script src="supabase.js"></script><script src="supabase-config.js"></script><script src="supabase-auth.js"></script><script src="profile-store.js"></script><script src="firebase-auth.js"></script><script src="two-w-config.js"></script><script src="config.js"></script><script src="calculation-engine.js"></script><script src="record-model.js"></script><script src="calculator.js"></script><script src="export.js"></script><script src="history.js"></script><script src="dashboard.js"></script><script src="app.js"></script>
+<script src="capacitor-core.js"></script><script src="capacitor-app.js"></script><script src="capacitor-local-notifications.js"></script><script src="capacitor-camera.js"></script><script src="supabase.js"></script><script src="supabase-config.js"></script><script src="user-storage.js"></script><script src="supabase-auth.js"></script><script src="profile-store.js"></script><script src="firebase-auth.js"></script><script src="two-w-config.js"></script><script src="config.js"></script><script src="calculation-engine.js"></script><script src="record-model.js"></script><script src="calculator.js"></script><script src="export.js"></script><script src="history.js"></script><script src="dashboard.js"></script><script src="app.js"></script>
 <script>if ('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));</script>
 </body></html>

@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const root = document.documentElement;
   const profiles = window.TBSProfiles;
   const initials = name => String(name || 'TB').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase() || 'TB';
+  const userStorage = () => window.TBSUserStorage?.storage || null;
   const current = () => profiles?.getActive() || {};
   const photoOf = p => profiles?.photo(p) || '';
   const resizePhoto = file => new Promise((resolve, reject) => { if (!file || !['image/jpeg','image/png'].includes(file.type)) return reject(new Error('รองรับเฉพาะ JPG, JPEG หรือ PNG')); const reader = new FileReader(); reader.onerror = () => reject(new Error('ไม่สามารถอ่านรูปได้')); reader.onload = () => { const image = new Image(); image.onerror = () => reject(new Error('ไฟล์รูปไม่ถูกต้อง')); image.onload = () => { const max = 512, scale = Math.min(1, max / Math.max(image.width, image.height)), canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale)); const ctx = canvas.getContext('2d'); ctx.drawImage(image, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', .78)); }; image.src = reader.result; }; reader.readAsDataURL(file); });
@@ -105,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderProfile() { const p = current(), name = p.fullName || p.displayName || ''; const greeting = document.getElementById('home-greeting'); if (greeting) greeting.textContent = name ? `สวัสดี, ${name}` : 'เริ่มคำนวณรายได้ของคุณ'; document.querySelectorAll('#home-avatar,#profile-avatar').forEach(x => setAvatar(x, p)); const preview = document.getElementById('profile-preview-name'); if (preview) preview.textContent = name || 'ยังไม่ได้สร้างโปรไฟล์'; fillForm(p); }
 
   function renderHome() {
-    const records = window.CWRecordModel ? window.CWRecordModel.readRecords(localStorage) : [], range = readRange();
+    const scopedStorage = userStorage();
+    const records = scopedStorage && window.CWRecordModel ? window.CWRecordModel.readRecords(scopedStorage) : [], range = readRange();
     const rows = records.filter(r => String(r.date) >= range.from && String(r.date) <= range.to);
     const sum = key => rows.reduce((a, r) => a + (Number(r[key]) || 0), 0);
     const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
@@ -148,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const codReminderIds = Array.from({length: 366}, (_, i) => ({id: codNotificationBaseId + i}));
   const localNotifications = () => window.capacitorLocalNotifications?.LocalNotifications || window.Capacitor?.Plugins?.LocalNotifications || null;
   const dateKey = d => { const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; };
-  const hasTodayRecord = () => (window.CWRecordModel?.readRecords(localStorage) || []).some(r => String(r.date) === dateKey(new Date()));
+  const hasTodayRecord = () => { const scopedStorage = userStorage(); return (scopedStorage && window.CWRecordModel?.readRecords(scopedStorage) || []).some(r => String(r.date) === dateKey(new Date())); };
   const reminderDate = offset => { const d=new Date(); d.setHours(22,0,0,0); d.setDate(d.getDate()+offset); return d; };
   async function cancelCodReminders() { try { await localNotifications()?.cancel({ notifications: codReminderIds }); } catch {} }
   async function scheduleCodReminder() {
@@ -214,14 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('✓ เคลียร์แคชสำเร็จ');
   };
   const resetApplicationData = () => {
-    localStorage.clear();
+    window.TBSUserStorage?.clearUserData?.();
     window.cwEditingRecordId = null;
     window.cwCurrentCalculation = null;
     document.getElementById('btn-reset')?.click();
     window.dispatchEvent(new Event('historyUpdated'));
     renderProfile(); renderHome(); navigationStack.length = 0; showView('view-home');
     closeResetDialog(); showToast('✓ Reset ข้อมูลสำเร็จ');
-    window.setTimeout(() => window.location.reload(), 2100);
+  window.setTimeout(() => window.location.reload(), 2100);
   };
   document.getElementById('settings-clear-cache')?.addEventListener('click', clearTemporaryData);
   document.getElementById('settings-reset-data')?.addEventListener('click', () => resetDialog?.classList.remove('hidden'));

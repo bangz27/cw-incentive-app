@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.CWRecordModel) return [];
     const start = from?.value || '0000-01-01';
     const end = to?.value || '9999-12-31';
-    return window.CWRecordModel.readRecords(localStorage).filter(row => String(row.date) >= start && String(row.date) <= end);
+    const scopedStorage = window.TBSUserStorage?.storage;
+    return scopedStorage ? window.CWRecordModel.readRecords(scopedStorage).filter(row => String(row.date) >= start && String(row.date) <= end) : [];
   }
   function render() {
     const rows = rangeRows();
@@ -36,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.querySelectorAll('[data-target="view-summary"]').forEach(button => button.addEventListener('click', render));
   window.addEventListener('historyUpdated', render);
+  window.addEventListener('userStorageReady', render);
   window.addEventListener('showSummary', render);
   render();
 });
