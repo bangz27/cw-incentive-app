@@ -182,6 +182,17 @@
   async function signUp(email, password) { message(''); const { data, error } = await authState.client.auth.signUp({ email, password, options: { emailRedirectTo: global.location.origin } }); if (error) throw error; if (!data.session) { message('สมัครสมาชิกสำเร็จ กรุณาตรวจสอบ Email เพื่อยืนยันบัญชี', 'success'); return; } await syncAuthenticatedSession(data.session); }
   async function resetPassword(email) { message(''); const { error } = await authState.client.auth.resetPasswordForEmail(email, { redirectTo: global.location.href }); if (error) throw error; message('ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว กรุณาตรวจสอบ Email', 'success'); }
   async function signOut() { await authState.client?.auth.signOut(); storage()?.clearUser(); }
+  async function signOutSuspendedUser() {
+    const button = $('suspended-sign-out');
+    if (button) button.disabled = true;
+    try {
+      await signOut();
+      $('auth-password') && ($('auth-password').value = '');
+    } catch (error) {
+      message(error.message || 'ออกจากระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+      if (button) button.disabled = false;
+    }
+  }
 
   function bindUi() {
     $('auth-login-form')?.addEventListener('submit', async event => { event.preventDefault(); const button = event.currentTarget.querySelector('button[type="submit"]'); button.disabled = true; try { await signIn($('auth-email').value.trim(), $('auth-password').value); } catch (error) { message(error.message || 'เข้าสู่ระบบไม่สำเร็จ'); } finally { button.disabled = false; } });
@@ -189,6 +200,7 @@
     $('auth-reset-form')?.addEventListener('submit', async event => { event.preventDefault(); try { await resetPassword($('auth-reset-email').value.trim()); } catch (error) { message(error.message || 'ส่งลิงก์ไม่สำเร็จ'); } });
     document.querySelectorAll('[data-auth-mode]').forEach(button => button.addEventListener('click', () => { const mode = button.dataset.authMode; ['login', 'register', 'reset'].forEach(name => show(`auth-${name}-form`, mode === name)); message(''); }));
     $('settings-logout')?.addEventListener('click', async () => { try { await signOut(); } catch (error) { global.showToast?.('ออกจากระบบไม่สำเร็จ'); } });
+    $('suspended-sign-out')?.addEventListener('click', signOutSuspendedUser);
     global.addEventListener('activeProfileChanged', () => syncProfile().catch(() => {}));
     global.addEventListener('historyUpdated', () => syncRecords().catch(() => {}));
   }

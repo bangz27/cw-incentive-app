@@ -306,3 +306,7 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 .owner-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}.owner-action-grid button{min-height:44px}.owner-danger-button{border-color:color-mix(in srgb,var(--danger) 45%,var(--border));color:var(--danger)}
 .owner-audit-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}.owner-audit-row:last-child{border-bottom:0}.owner-audit-row div{display:grid;gap:3px}.owner-audit-row small,.owner-audit-row>span{color:var(--muted)}
 @media(max-width:380px){.owner-search-row{grid-template-columns:1fr}.owner-detail-grid{grid-template-columns:1fr}.owner-action-grid{grid-template-columns:1fr}.owner-console-card{padding:14px}}
+
+/* Suspended license exit: sign out before returning to Auth Gate */
+.suspended-login-button{margin-top:10px;background:var(--card);color:var(--orange-dark);border:1px solid var(--orange)}
+.suspended-login-button:hover{background:var(--orange-soft);color:var(--orange-dark)}
