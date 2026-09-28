@@ -9,7 +9,7 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 test('all purchase/contact actions use the exact LINE OA URL and external opener', () => {
   const html = read('index.html');
   const manager = read('license-manager.js');
-  assert.equal((html.match(/data-line-contact/g) || []).length, 4);
+  assert.equal((html.match(/data-line-contact/g) || []).length, 5);
   assert.match(manager, /https:\/\/lin\.ee\/7WsyQ6W/);
   assert.match(manager, /global\.open\?\./);
   assert.match(manager, /global\.location\?\.assign\?\./);

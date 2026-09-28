@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     recent.className = 'stack-list'; recent.innerHTML = records.slice(0, 3).map(r => `<div class="record-card"><span class="record-icon material-icons-round">${r.vehicleType === '2W' ? 'two_wheeler' : 'local_shipping'}</span><div><strong>${r.vehicleType} · Zone ${r.zone}</strong><small>${Number(r.parcel || 0).toLocaleString()} ส่งสำเร็จ · ${r.date}</small></div><div class="record-money">${money(Number(r.netIncentive) || 0)}<small>หัก ${money(Number(r.sameAddressDeduction) || 0)}</small></div></div>`).join('');
   }
 
-  const CURRENT_VERSION = '1.7.1';
+  const CURRENT_VERSION = '1.8.1';
   const RELEASES_API = 'https://api.github.com/repos/bangz27/cw-incentive-app/releases/latest';
   const parseVersion = value => String(value || '').replace(/^v/i, '').split('.').map(x => Number.parseInt(x, 10) || 0).slice(0, 3);
   const newerThanCurrent = value => { const a = parseVersion(value), b = parseVersion(CURRENT_VERSION); return a.some((n, i) => n !== b[i] && n > b[i]) && a.map((n, i) => n - b[i]).find(n => n) > 0; };
