@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f97316">
+  <title>TBS License Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <section id="loginView" class="login-view">
+    <div class="login-art">
+      <div class="brand-mark">TBS</div>
+      <div class="art-copy">
+        <span class="eyebrow">LICENSE CENTER</span>
+        <h1>จัดการสิทธิ์<br>ให้เรียบง่าย</h1>
+        <p>ศูนย์สำหรับดูแลบัญชีสมาชิก TBS Incentive<br>แบบเร็ว ชัด และไม่ต้องแตะระบบหลังบ้าน</p>
+      </div>
+      <div class="art-foot">TBS Incentive · Internal Use</div>
+    </div>
+    <div class="login-panel">
+      <div class="mobile-brand"><span class="brand-mark small">TBS</span><span>License Center</span></div>
+      <div class="login-heading">
+        <span class="eyebrow">SIGN IN</span>
+        <h2>เข้าสู่ศูนย์จัดการ</h2>
+        <p>ใช้บัญชีที่ได้รับสิทธิ์เท่านั้น</p>
+      </div>
+      <form id="loginForm" class="login-form">
+        <label>อีเมล<input id="email" type="email" autocomplete="username" placeholder="you@example.com" required></label>
+        <label>รหัสผ่าน<div class="password-wrap"><input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required><button type="button" id="togglePassword" class="icon-btn">ดู</button></div></label>
+        <button class="primary-btn wide" type="submit">เข้าสู่ระบบ <span>→</span></button>
+        <p id="loginError" class="form-error"></p>
+      </form>
+      <div class="login-note">การยืนยันสิทธิ์ Owner ทำที่ Supabase ฝั่งเซิร์ฟเวอร์</div>
+    </div>
+  </section>
+
+  <section id="appView" class="app-view hidden">
+    <aside class="sidebar">
+      <div class="side-brand"><span class="brand-mark">TBS</span><div><strong>License</strong><small>Center</small></div></div>
+      <nav>
+        <button class="nav-item active" data-page="home"><span>⌂</span>ภาพรวม</button>
+        <button class="nav-item" data-page="members"><span>◎</span>สมาชิก</button>
+        <button class="nav-item" data-page="activity"><span>↳</span>ประวัติการทำรายการ</button>
+      </nav>
+      <div class="side-bottom">
+        <div class="signed-in"><span class="avatar" id="avatar">T</span><div><strong id="signedEmail">Owner</strong><small>Authorized</small></div></div>
+        <button id="logoutBtn" class="logout-btn">ออกจากระบบ</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div><span class="eyebrow" id="pageEyebrow">OVERVIEW</span><h2 id="pageTitle">ภาพรวม</h2></div>
+        <div class="top-actions"><span class="live-dot"></span><span>Connected</span></div>
+      </header>
+
+      <div class="content">
+        <div id="pageHome" class="page">
+          <div class="hero-row">
+            <div>
+              <h1>จัดการสิทธิ์สมาชิก</h1>
+              <p>ค้นหาบัญชี แล้วจัดการแพ็กเกจได้จากที่เดียว</p>
+            </div>
+            <button class="secondary-btn" data-focus-search>ค้นหาสมาชิก <span>⌕</span></button>
+          </div>
+          <div class="stats-row">
+            <div class="stat-card"><span>สถานะระบบ</span><strong class="green">พร้อมใช้งาน</strong><small>Supabase · Server time</small></div>
+            <div class="stat-card"><span>ราคา Monthly</span><strong>฿49</strong><small>30 วัน</small></div>
+            <div class="stat-card"><span>ราคา Lifetime</span><strong>฿79</strong><small>ตลอดชีพ</small></div>
+          </div>
+          <div class="search-card" id="searchCard">
+            <div class="section-head"><div><span class="eyebrow">MEMBER LOOKUP</span><h3>ค้นหาบัญชี</h3></div><span class="hint">ค้นด้วยอีเมล</span></div>
+            <form id="searchForm" class="search-form"><input id="searchEmail" type="email" placeholder="เช่น rider@example.com" required><button class="primary-btn" type="submit">ค้นหา <span>→</span></button></form>
+            <div id="searchResult" class="result-slot empty-result"><div class="empty-icon">⌕</div><p>ยังไม่ได้ค้นหาสมาชิก</p><small>ผลลัพธ์จะแสดงตรงนี้</small></div>
+          </div>
+        </div>
+
+        <div id="pageMembers" class="page hidden">
+          <div class="hero-row compact"><div><span class="eyebrow">MEMBERS</span><h1>สมาชิก</h1><p>ค้นหาและจัดการสิทธิ์รายบัญชี</p></div></div>
+          <div class="search-card">
+            <form id="searchForm2" class="search-form"><input id="searchEmail2" type="email" placeholder="ค้นหาอีเมล..." required><button class="primary-btn" type="submit">ค้นหา <span>→</span></button></form>
+            <div id="searchResult2" class="result-slot empty-result"><div class="empty-icon">◎</div><p>ค้นหาสมาชิกเพื่อเริ่มจัดการ</p></div>
+          </div>
+        </div>
+
+        <div id="pageActivity" class="page hidden">
+          <div class="hero-row compact"><div><span class="eyebrow">AUDIT TRAIL</span><h1>ประวัติการทำรายการ</h1><p>เลือกสมาชิกก่อนเพื่อดูประวัติสิทธิ์</p></div></div>
+          <div id="auditEmpty" class="search-card centered"><div class="empty-icon large">↳</div><h3>ยังไม่มีสมาชิกที่เลือก</h3><p>ค้นหาสมาชิกจากหน้า “สมาชิก” แล้วเปิดดูประวัติได้ทันที</p></div>
+          <div id="auditPanel" class="search-card hidden">
+            <div class="section-head"><div><span class="eyebrow">AUDIT TRAIL</span><h3 id="auditEmail">—</h3></div><button class="text-btn" id="refreshAudit">รีเฟรช</button></div>
+            <div id="auditList"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <div id="memberModal" class="modal hidden">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card">
+      <button class="modal-close" data-close-modal>×</button>
+      <span class="eyebrow">LICENSE</span>
+      <h2 id="modalEmail">—</h2>
+      <div id="licenseSummary"></div>
+      <div class="action-grid">
+        <button class="action action-orange" data-action="monthly"><span>30</span><div><b>Monthly</b><small>เพิ่ม/ต่อ 30 วัน · ฿49</small></div></button>
+        <button class="action" data-action="custom"><span>＋</span><div><b>กำหนดวันเอง</b><small>เลือกจำนวนวัน</small></div></button>
+        <button class="action" data-action="lifetime"><span>∞</span><div><b>Lifetime</b><small>สิทธิ์ตลอดชีพ · ฿79</small></div></button>
+        <button class="action danger" id="toggleStatusAction" data-action="toggle"><span>!</span><div><b id="toggleStatusText">ระงับสิทธิ์</b><small>เปลี่ยนสถานะการใช้งาน</small></div></button>
+      </div>
+      <div id="customDays" class="custom-days hidden"><label>จำนวนวัน<input id="daysInput" type="number" min="1" max="3650" value="7"></label><button class="primary-btn" id="grantCustomBtn">เพิ่มสิทธิ์</button></div>
+      <p id="actionMessage" class="form-error"></p>
+      <button class="text-btn full" data-close-modal>ปิด</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
