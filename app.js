@@ -57,6 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!appApi?.addListener) return;
     appApi.addListener('backButton', ({ canGoBack } = {}) => {
       if (window.ModernSelectionSheet?.isOpen?.()) { window.ModernSelectionSheet.close(); return; }
+      if (window.TBSLicenseManager && !window.TBSLicenseManager.canUseApp?.()) {
+        document.getElementById('trial-confirm-dialog')?.classList.add('hidden');
+        document.getElementById('license-gate')?.scrollIntoView?.({ block: 'start' });
+        return;
+      }
       if (childViewIds.has(activeViewId) && navigationStack.length) { goBackInApp(); return; }
       if (canGoBack) { window.history.back(); return; }
       appApi.exitApp?.();

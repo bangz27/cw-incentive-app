@@ -42,15 +42,24 @@ test('Package Selection is persistent after auth and does not auto-start Trial',
   const html = read('index.html');
   const auth = read('supabase-auth.js');
   const manager = read('license-manager.js');
+  const app = read('app.js');
   assert.match(html, /data-package-selection/);
   assert.match(html, /id="package-gate-title"/);
   assert.match(html, /ยังไม่มีแพ็กเกจที่ใช้งานอยู่/);
+  assert.match(html, /pricing-card-lifetime[\s\S]*เลือกแพ็กเกจ/);
+  assert.match(html, /pricing-card-monthly[\s\S]*เลือกแพ็กเกจ/);
   assert.match(html, /id="start-trial-button"[^>]*data-start-trial/);
   assert.match(html, /id="trial-confirm-dialog"/);
+  assert.ok(html.indexOf('pricing-card-lifetime') < html.indexOf('pricing-card-monthly'));
+  assert.ok(html.indexOf('pricing-card-monthly') < html.indexOf('pricing-card-trial'));
   assert.match(auth, /TBSLicenseManager\?\.loadLicense/);
   assert.doesNotMatch(auth, /TBSLicenseManager\?\.startTrial/);
   assert.match(manager, /if \(!serverLicense\)/);
   assert.match(manager, /canStartTrial/);
+  assert.match(manager, /การทดลองใช้สิ้นสุดแล้ว/);
+  assert.match(manager, /เลือกแพ็กเกจเพื่อใช้งานต่อ/);
+  assert.match(app, /TBSLicenseManager && !window\.TBSLicenseManager\.canUseApp/);
+  assert.match(app, /trial-confirm-dialog.*classList\.add\('hidden'\)/);
 });
 
 test('Trial activation is account-bound, server-side, one-time, and 14 days', () => {

@@ -169,7 +169,7 @@
     suspended?.classList.toggle('hidden', status !== STATUSES.SUSPENDED);
     packageGate?.classList.toggle('hidden', !showPackage);
     const title = !license ? 'เลือกแพ็กเกจ / สิทธิ์การใช้งาน' : license.plan === 'TRIAL' && status === STATUSES.EXPIRED ? 'การทดลองใช้สิ้นสุดแล้ว' : 'เลือกแพ็กเกจ / สิทธิ์การใช้งาน';
-    const message = !license ? 'ยังไม่มีแพ็กเกจที่ใช้งานอยู่' : license.plan === 'TRIAL' && status === STATUSES.EXPIRED ? 'ต้องมีสิทธิ์ Lifetime เพื่อใช้งานต่อ' : 'เลือกวิธีเริ่มใช้งานด้วยตัวเอง';
+    const message = !license ? 'ยังไม่มีแพ็กเกจที่ใช้งานอยู่' : status === STATUSES.EXPIRED ? 'เลือกแพ็กเกจเพื่อใช้งานต่อ' : 'เลือกวิธีเริ่มใช้งานด้วยตัวเอง';
     setText('package-gate-title', title); setText('package-gate-message', message);
     const trialCard = $('trial-pricing-card'); const trialButton = $('start-trial-button');
     const trialAllowed = canStartTrial();
