@@ -116,31 +116,66 @@ document.addEventListener('DOMContentLoaded', () => {
     recent.className = 'stack-list'; recent.innerHTML = records.slice(0, 3).map(r => `<div class="record-card"><span class="record-icon material-icons-round">${r.vehicleType === '2W' ? 'two_wheeler' : 'local_shipping'}</span><div><strong>${r.vehicleType} · Zone ${r.zone}</strong><small>${Number(r.parcel || 0).toLocaleString()} ส่งสำเร็จ · ${r.date}</small></div><div class="record-money">${money(Number(r.netIncentive) || 0)}<small>หัก ${money(Number(r.sameAddressDeduction) || 0)}</small></div></div>`).join('');
   }
 
-  const CURRENT_VERSION = '1.8.1';
-  const RELEASES_API = 'https://api.github.com/repos/bangz27/cw-incentive-app/releases/latest';
-  const parseVersion = value => String(value || '').replace(/^v/i, '').split('.').map(x => Number.parseInt(x, 10) || 0).slice(0, 3);
-  const newerThanCurrent = value => { const a = parseVersion(value), b = parseVersion(CURRENT_VERSION); return a.some((n, i) => n !== b[i] && n > b[i]) && a.map((n, i) => n - b[i]).find(n => n) > 0; };
   const showToast = (message, tone = '') => { const toast = document.getElementById('toast'); if (!toast) return; toast.textContent = message; toast.classList.toggle('toast-success', tone === 'success'); toast.classList.add('show'); clearTimeout(window.__tbsToastTimer); window.__tbsToastTimer = setTimeout(() => { toast.classList.remove('show'); toast.classList.remove('toast-success'); }, 2000); };
   window.TBSShowToast = showToast;
-  async function checkForUpdates(manual = false) {
-    const now = Date.now(), last = Number(localStorage.getItem('lastUpdateCheck') || 0);
-    if (!manual && last && now - last < 86400000) return;
-    if (!navigator.onLine && !manual) return;
-    try {
-      const response = await fetch(RELEASES_API, { headers: { Accept: 'application/vnd.github+json' }, cache: 'no-store' });
-      if (!response.ok) throw new Error(`GitHub API ${response.status}`);
-      const release = await response.json();
-      localStorage.setItem('lastUpdateCheck', String(now));
-      if (release.draft || release.prerelease || !newerThanCurrent(release.tag_name)) { document.getElementById('update-card')?.classList.add('hidden'); if (manual) showToast('คุณใช้เวอร์ชันล่าสุดแล้ว'); return; }
-      const apk = (release.assets || []).find(asset => /\.apk$/i.test(asset.name));
-      if (!apk) return;
-      const card = document.getElementById('update-card'); if (!card) return;
-      card.dataset.apkUrl = apk.browser_download_url; card.classList.remove('hidden');
-      const message = document.getElementById('update-message'); if (message) message.textContent = `TBS Incentive V${String(release.tag_name).replace(/^v/i, '')}`;
-      document.getElementById('update-now')?.addEventListener('click', () => window.open(card.dataset.apkUrl, '_blank', 'noopener,noreferrer'), { once: true });
-      document.getElementById('update-later')?.addEventListener('click', () => card.classList.add('hidden'), { once: true });
-    } catch (error) { if (manual) showToast('ตรวจสอบการอัปเดตไม่ได้ — แอปยังใช้งานต่อได้'); }
-  }
+  const versionInfo = window.TBSAppVersion || { name: '1.9.0', display: 'V1.9.0', code: 10 };
+  const updateChecker = window.TBSUpdateChecker?.createChecker?.({ currentVersion: versionInfo.name }) || null;
+  const updateDialog = document.getElementById('update-dialog');
+  const updateDialogClose = () => updateDialog?.classList.add('hidden');
+  const openExternalUrl = url => {
+    const value = String(url || '').trim();
+    if (!/^https?:\/\//i.test(value)) { showToast('ลิงก์ดาวน์โหลดไม่ถูกต้อง'); return false; }
+    try { if (window.open?.(value, '_blank', 'noopener,noreferrer')) return true; } catch {}
+    try { window.location?.assign?.(value); return true; } catch {}
+    showToast('ไม่สามารถเปิดหน้าดาวน์โหลดได้');
+    return false;
+  };
+  const setUpdateText = (id, value) => { const node = document.getElementById(id); if (node) node.textContent = value; };
+  const renderUpdateState = result => {
+    setUpdateText('settings-app-version', versionInfo.display);
+    const hasRelease = Boolean(result?.release?.version);
+    const latestRow = document.getElementById('update-latest-version-row');
+    latestRow?.classList.toggle('hidden', !hasRelease);
+    if (hasRelease) setUpdateText('update-latest-version', result.release.displayVersion);
+    const statusText = {
+      'update-available': `มีเวอร์ชันใหม่ ${result.release.displayVersion} พร้อมดาวน์โหลด`,
+      latest: '✓ ใช้เวอร์ชันล่าสุด',
+      ahead: 'เวอร์ชันปัจจุบันใหม่กว่า Release ล่าสุด',
+      offline: 'ไม่สามารถตรวจสอบการอัปเดตได้ กรุณาลองใหม่ภายหลัง',
+      error: 'ไม่สามารถตรวจสอบการอัปเดตได้ กรุณาลองใหม่ภายหลัง',
+      cooldown: 'รอตรวจสอบตามรอบอัตโนมัติ'
+    };
+    setUpdateText('update-settings-status', statusText[result?.status] || 'กำลังตรวจสอบการอัปเดต');
+    const badge = document.getElementById('update-status-badge');
+    if (badge) { badge.textContent = result?.status === 'update-available' ? 'มีเวอร์ชันใหม่' : result?.status === 'latest' ? 'ล่าสุด' : 'สถานะ'; badge.classList.toggle('is-update', result?.status === 'update-available'); }
+  };
+  const showUpdateDialog = release => {
+    if (!release || !updateDialog) return;
+    updateDialog.dataset.downloadUrl = release.downloadUrl || release.htmlUrl || '';
+    updateDialog.dataset.detailsUrl = release.htmlUrl || release.downloadUrl || '';
+    setUpdateText('update-dialog-version', release.displayVersion);
+    setUpdateText('update-dialog-current-version', versionInfo.display);
+    setUpdateText('update-dialog-version-summary', release.displayVersion);
+    const notes = document.getElementById('update-dialog-changelog');
+    if (notes) notes.textContent = String(release.body || '').trim() || 'ไม่พบ Release Notes ใน GitHub Release นี้';
+    updateDialog.classList.remove('hidden');
+  };
+  const runUpdateCheck = async (manual = false, showDialog = false) => {
+    if (!updateChecker) return null;
+    const result = await updateChecker.check({ manual, online: navigator.onLine !== false });
+    renderUpdateState(result);
+    if (result.status === 'update-available' && (manual || showDialog)) showUpdateDialog(result.release);
+    if (manual && result.status === 'latest') showToast('คุณใช้เวอร์ชันล่าสุดแล้ว', 'success');
+    if (manual && result.status === 'ahead') showToast('เวอร์ชันปัจจุบันใหม่กว่า Release ล่าสุด');
+    if (manual && (result.status === 'offline' || result.status === 'error')) showToast('ตรวจสอบการอัปเดตไม่ได้ — แอปยังใช้งานต่อได้');
+    return result;
+  };
+  document.getElementById('update-dialog-close')?.addEventListener('click', updateDialogClose);
+  document.getElementById('update-later')?.addEventListener('click', updateDialogClose);
+  document.querySelector('[data-update-dismiss]')?.addEventListener('click', updateDialogClose);
+  document.getElementById('update-details')?.addEventListener('click', () => openExternalUrl(updateDialog?.dataset.detailsUrl));
+  document.getElementById('update-now')?.addEventListener('click', () => openExternalUrl(updateDialog?.dataset.downloadUrl));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && !updateDialog?.classList.contains('hidden')) updateDialogClose(); });
   let editingProfileId = current().profileId || null;
   document.getElementById('home-date-picker')?.addEventListener('click', () => { const r = readRange(); document.getElementById('range-from').value = r.from; document.getElementById('range-to').value = r.to; document.getElementById('date-range-editor').classList.remove('hidden'); });
   document.getElementById('range-cancel')?.addEventListener('click', () => document.getElementById('date-range-editor').classList.add('hidden'));
@@ -211,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeResetDialog = () => resetDialog?.classList.add('hidden');
   const clearTemporaryData = async () => {
     try { sessionStorage.clear(); } catch {}
-    localStorage.removeItem('lastUpdateCheck');
+    localStorage.removeItem('lastUpdateCheck'); localStorage.removeItem('tbs_update_cache');
     try { if (window.caches) { const cacheNames = await window.caches.keys(); await Promise.all(cacheNames.map(name => window.caches.delete(name))); } } catch {}
     showToast('✓ เคลียร์แคชสำเร็จ');
   };
@@ -231,10 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
   resetDialog?.querySelector('[data-reset-cancel]')?.addEventListener('click', closeResetDialog);
   document.getElementById('reset-data-confirm')?.addEventListener('click', resetApplicationData);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !resetDialog?.classList.contains('hidden')) closeResetDialog(); });
-  document.getElementById('check-updates')?.addEventListener('click', () => checkForUpdates(true)); document.getElementById('profile-manual')?.addEventListener('click', () => showView('view-guide')); document.getElementById('guide-back')?.addEventListener('click', () => goBackInApp()); document.getElementById('profile-contact')?.addEventListener('click', () => showView('view-contact')); document.getElementById('contact-back')?.addEventListener('click', () => goBackInApp()); document.getElementById('profile-about')?.addEventListener('click', () => showView('view-about')); document.getElementById('about-back')?.addEventListener('click', () => goBackInApp()); document.getElementById('header-refresh')?.addEventListener('click', () => document.getElementById('btn-reset')?.click());
+  document.getElementById('check-updates')?.addEventListener('click', () => runUpdateCheck(true, true)); document.getElementById('profile-manual')?.addEventListener('click', () => showView('view-guide')); document.getElementById('guide-back')?.addEventListener('click', () => goBackInApp()); document.getElementById('profile-contact')?.addEventListener('click', () => showView('view-contact')); document.getElementById('contact-back')?.addEventListener('click', () => goBackInApp()); document.getElementById('profile-about')?.addEventListener('click', () => showView('view-about')); document.getElementById('about-back')?.addEventListener('click', () => goBackInApp()); document.getElementById('header-refresh')?.addEventListener('click', () => document.getElementById('btn-reset')?.click());
   document.getElementById('profile-payment-details')?.addEventListener('click', () => showView('view-payment-details')); document.getElementById('payment-details-back')?.addEventListener('click', () => goBackInApp());
-  document.getElementById('profile-share')?.addEventListener('click', async () => { const url = 'https://github.com/bangz27/cw-incentive-app/releases/download/v1.5/TBS-Incentive-v1.5.apk'; const title = 'TBS Incentive'; const text = 'ลิงก์ดาวน์โหลด Production จะพร้อมใช้งานเมื่อ Signed APK ถูกเผยแพร่'; if (!url) { showToast('ลิงก์ดาวน์โหลด Production ยังไม่พร้อมใช้งาน'); return; } try { if (typeof navigator.share === 'function') { await navigator.share({ title, text, url }); return; } } catch (error) { if (error?.name === 'AbortError') return; } const message = `${title}\n${text}\n${url}`; try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(message); showToast('คัดลอกลิงก์ดาวน์โหลดแล้ว'); return; } } catch (error) { /* Continue to the browser fallback. */ } window.open(url, '_blank', 'noopener,noreferrer'); });
+  document.getElementById('profile-share')?.addEventListener('click', async () => { const releasesPage = 'https://github.com/bangz27/cw-incentive-app/releases'; let url = releasesPage, displayVersion = ''; try { const result = await updateChecker?.check({ manual: true, online: navigator.onLine !== false }); if (result?.release?.htmlUrl && result.status !== 'ahead') { url = result.release.htmlUrl; displayVersion = result.release.displayVersion; } } catch {} const title = 'TBS Incentive'; const text = displayVersion ? `ดาวน์โหลด TBS Incentive ${displayVersion} จาก GitHub Releases` : 'ดาวน์โหลด TBS Incentive จาก GitHub Releases'; try { if (typeof navigator.share === 'function') { await navigator.share({ title, text, url }); return; } } catch (error) { if (error?.name === 'AbortError') return; } const message = `${title}\n${text}\n${url}`; try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(message); showToast('คัดลอกลิงก์ GitHub Releases แล้ว'); return; } } catch (error) { /* Continue to the browser fallback. */ } openExternalUrl(url); });
   document.querySelectorAll('[data-guide-vehicle]').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('[data-guide-vehicle]').forEach(x => x.classList.toggle('active', x === button)); const detail = document.getElementById('guide-detail'); if (detail) detail.innerHTML = button.dataset.guideVehicle === '2W' ? '<h2>วิธีใช้งาน 2W</h2><p class="muted">กรอกวันที่ โซน และจำนวนส่งสำเร็จ ระบบคำนวณ Progressive Tier ของ 2W อัตโนมัติ ตรวจ RTS (฿1.50/ชิ้น) บ้านซ้ำ และ Net Incentive ก่อนบันทึก</p>' : '<h2>วิธีใช้งาน 4W</h2><p class="muted">กรอกวันที่ โซน จำนวน Size S และ Size L ระบบคำนวณ Progressive Tier ของ 4W อัตโนมัติ ตรวจ RTS (฿1.50/ชิ้น) บ้านซ้ำ และ Net Incentive ก่อนบันทึก</p>'; })); document.getElementById('profile-support')?.addEventListener('click', () => showView('view-support')); document.getElementById('support-back')?.addEventListener('click', () => goBackInApp());
   document.querySelectorAll('.banner-close').forEach(button => button.addEventListener('click', () => button.closest('.profile-autofill-banner,.rts-help')?.classList.add('is-hidden'))); document.getElementById('calculator-create-profile')?.addEventListener('click', () => showView('view-profile'));
-  window.addEventListener('activeProfileChanged', renderProfile); window.addEventListener('historyUpdated', renderHome); renderProfile(); renderHome(); showView('view-home'); checkForUpdates(false);
+  window.addEventListener('activeProfileChanged', renderProfile); window.addEventListener('historyUpdated', renderHome); renderProfile(); renderHome(); showView('view-home'); runUpdateCheck(false, true);
 });

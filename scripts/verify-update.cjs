@@ -13,7 +13,17 @@ const app = read('app.js');
 const css = read('style.css');
 const build = read('scripts/build-web.cjs');
 const bannerPath = path.join(root, 'tbs_banner.png');
+const version = read('app-version.js');
+const updateChecker = read('update-checker.js');
 
+assert(version.includes("version = '1.9.0'"), 'App version must be 1.9.0');
+assert(updateChecker.includes('compareVersions'), 'Numeric version comparison is missing');
+assert(updateChecker.includes('api.github.com/repos/bangz27/cw-incentive-app/releases/latest'), 'GitHub Releases API source missing');
+assert(!app.includes("CURRENT_VERSION = '1.8.1'"), 'Legacy hard-coded current version remains');
+assert(html.includes('id="update-dialog"'), 'Update dialog is missing');
+assert(html.includes('id="update-dialog-changelog"'), 'Release changelog container is missing');
+assert(!app.includes('/releases/download/v1.5/'), 'Pinned legacy APK URL remains');
+assert(app.includes('cw-incentive-app/releases'), 'Share flow must use the GitHub Releases page');
 const requiredPresets = ['today', '2w', '4w-mid', '4w-end'];
 for (const preset of requiredPresets) {
   assert(html.includes(`data-range-preset="${preset}"`), `Missing Home preset: ${preset}`);

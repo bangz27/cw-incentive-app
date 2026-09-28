@@ -1,6 +1,6 @@
 {
   "name": "cw-incentive-app",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "private": true,
   "description": "TBS Incentive mobile-first web app packaged for Android (v1.7)",
   "engines": {
