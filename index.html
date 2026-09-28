@@ -27,6 +27,16 @@
       <p id="auth-message" class="auth-message hidden" role="alert"></p><small class="auth-footer">TBS Solutions</small>
     </div>
   </section>
+  <div id="trial-confirm-dialog" class="auth-modal hidden" role="dialog" aria-modal="true" aria-labelledby="trial-confirm-title">
+    <div class="auth-modal-backdrop" data-trial-confirm-dismiss></div>
+    <div class="auth-card trial-confirm-card">
+      <span class="license-gate-icon material-icons-round">science</span>
+      <h2 id="trial-confirm-title">เริ่มทดลองใช้ 14 วัน?</h2>
+      <p>คุณสามารถใช้งาน TBS Incentive ได้เป็นเวลา 14 วัน</p>
+      <p id="trial-confirm-message" class="auth-message error hidden" role="alert"></p>
+      <div class="trial-confirm-actions"><button type="button" class="text-button" id="trial-confirm-cancel">ยกเลิก</button><button type="button" class="primary-button" id="trial-confirm-button">เริ่มทดลองใช้</button></div>
+    </div>
+  </div>
   <div id="legacy-migration-dialog" class="auth-modal hidden" role="dialog" aria-modal="true" aria-labelledby="legacy-migration-title">
     <div class="auth-card migration-card">
       <h2 id="legacy-migration-title">พบข้อมูลเดิมในเครื่อง</h2>
@@ -44,13 +54,14 @@
   </header>
 
   <div id="license-gate" class="license-gate hidden" aria-live="polite">
-    <section id="expired-gate" class="license-gate-card card">
-      <span class="license-gate-icon material-icons-round">lock</span><span class="eyebrow">สิทธิ์การใช้งาน</span>
-      <h1>สิทธิ์ทดลองใช้หมดแล้ว</h1><p>ช่วงทดลองใช้ฟรี 14 วันของคุณหมดอายุแล้ว</p><p class="muted">เลือกแพ็กเกจเพื่อใช้งาน TBS Incentive ต่อ</p><p id="expired-renewal-message" class="expired-renewal-message hidden">หมดอายุแล้ว ต่ออายุเหอะ เพื่อผู้พัฒนา ❤️</p>
+    <section id="expired-gate" class="license-gate-card card" data-package-selection>
+      <span class="license-gate-icon material-icons-round">verified_user</span><span class="eyebrow">สิทธิ์การใช้งาน</span>
+      <h1 id="package-gate-title">เลือกแพ็กเกจ / สิทธิ์การใช้งาน</h1>
+      <p id="package-gate-message">ยังไม่มีแพ็กเกจที่ใช้งานอยู่</p><p class="muted">เลือกวิธีเริ่มใช้งานด้วยตัวเอง</p><p id="expired-renewal-message" class="expired-renewal-message hidden">หมดอายุแล้ว ต่ออายุเหอะ เพื่อผู้พัฒนา ❤️</p>
       <div id="license-pricing" class="license-pricing-grid">
-        <article class="pricing-card"><span class="eyebrow">FREE TRIAL</span><strong>ฟรี</strong><small>ใช้งาน 14 วัน</small><span>✓ ใช้งานเต็มระบบ</span><span>✓ คำนวณและบันทึกประวัติ</span></article>
-        <article class="pricing-card"><span class="eyebrow">STARTER</span><strong>49 บาท</strong><small>ใช้งาน 30 วัน</small><span>✓ ใช้งานเต็มระบบ</span><button type="button" class="text-button line-button" data-license-pricing data-line-contact>ซื้อ / ต่ออายุ</button></article>
-        <article class="pricing-card pricing-card-featured pricing-card-lifetime"><span class="pricing-badge">แนะนำ</span><span class="eyebrow">LIFETIME</span><strong>79 บาท</strong><small>ใช้งานตลอดชีพ</small><span>✓ ใช้งานเต็มระบบ</span><span>✓ ไม่หมดอายุ</span><button type="button" class="primary-button line-button" data-license-pricing data-line-contact>ซื้อ / ต่ออายุ</button></article>
+        <article class="pricing-card pricing-card-lifetime"><span class="pricing-badge">แนะนำ</span><span class="eyebrow">LIFETIME</span><strong>79 บาท</strong><small>ใช้งานตลอดชีพ</small><span>✓ ใช้งานเต็มระบบ</span><span>✓ ไม่หมดอายุ</span><button type="button" class="primary-button line-button" data-license-pricing data-line-contact>ซื้อ / ต่ออายุ</button></article>
+        <article id="trial-pricing-card" class="pricing-card pricing-card-trial"><span class="eyebrow">ทดลองใช้ฟรี</span><strong>ฟรี</strong><small>ใช้งาน 14 วัน</small><span>✓ ใช้งานเต็มระบบ</span><span>✓ เริ่มเมื่อผู้ใช้ยืนยันเท่านั้น</span><button type="button" class="primary-button trial-start-button" id="start-trial-button" data-start-trial>เริ่มทดลองใช้</button></article>
+        <article class="pricing-card pricing-card-monthly"><span class="eyebrow">STARTER</span><strong>49 บาท</strong><small>ใช้งาน 30 วัน</small><span>✓ ใช้งานเต็มระบบ</span><button type="button" class="text-button line-button" data-license-pricing data-line-contact>ซื้อ / ต่ออายุ</button></article>
       </div>
       <p class="license-payment-note">เลือกแพ็กเกจแล้วติดต่อ Admin เพื่อแจ้งหลักฐานการชำระเงิน ระบบจะปลดล็อกเมื่อ Admin Activate License เท่านั้น</p>
       <button type="button" class="text-button" data-license-refresh><span class="material-icons-round">refresh</span>รีเฟรชสิทธิ์</button>
