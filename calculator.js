@@ -24,5 +24,5 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('vehicleSelected',e=>setVehicle(e.detail));
   window.addEventListener('activeProfileChanged',()=>{loadProfileIntoForm();calculate();});
   [zone,s,l,parcel,same,rts,$('calc-date')].forEach(el=>{el?.addEventListener('input',calculate);el?.addEventListener('change',calculate);});
-  $('btn-reset')?.addEventListener('click',reset); initZones(); zone.value=localStorage.getItem('cw_last_zone')||''; zone?.addEventListener('change',()=>localStorage.setItem('cw_last_zone',zone.value)); $('calc-date').valueAsDate=new Date(); loadProfileIntoForm(); if (!window.TBSProfiles?.getActive?.()?.position) setVehicle('4W');
+  $('btn-reset')?.addEventListener('click',reset); $('btn-calculate')?.addEventListener('click',calculate); initZones(); zone.value=localStorage.getItem('cw_last_zone')||''; zone?.addEventListener('change',()=>localStorage.setItem('cw_last_zone',zone.value)); $('calc-date').valueAsDate=new Date(); loadProfileIntoForm(); if (!window.TBSProfiles?.getActive?.()?.position) setVehicle('4W');
 });

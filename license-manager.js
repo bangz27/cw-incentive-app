@@ -106,6 +106,7 @@
   function render() {
     const license = state.license;
     const status = getStatus();
+    const displayStatus = license?.plan === 'TRIAL' && status === STATUSES.ACTIVE ? 'TRIAL' : status;
     const active = canUseApp();
     document?.documentElement?.classList.toggle('license-active', active);
     document?.documentElement?.classList.toggle('license-locked', !active);
@@ -124,7 +125,7 @@
     gate?.classList.toggle('hidden', active);
     suspended?.classList.toggle('hidden', status !== STATUSES.SUSPENDED);
     expired?.classList.toggle('hidden', status !== STATUSES.EXPIRED && status !== 'UNKNOWN');
-    document.querySelectorAll('[data-license-status]').forEach(node => { node.textContent = status; node.dataset.status = status; });
+    document.querySelectorAll('[data-license-status]').forEach(node => { node.textContent = displayStatus; node.dataset.status = displayStatus; });
   }
 
   function bindUi() {
