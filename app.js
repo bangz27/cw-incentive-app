@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const RELEASES_API = 'https://api.github.com/repos/bangz27/cw-incentive-app/releases/latest';
   const parseVersion = value => String(value || '').replace(/^v/i, '').split('.').map(x => Number.parseInt(x, 10) || 0).slice(0, 3);
   const newerThanCurrent = value => { const a = parseVersion(value), b = parseVersion(CURRENT_VERSION); return a.some((n, i) => n !== b[i] && n > b[i]) && a.map((n, i) => n - b[i]).find(n => n) > 0; };
-  const showToast = message => { const toast = document.getElementById('toast'); if (!toast) return; toast.textContent = message; toast.classList.add('show'); clearTimeout(window.__tbsToastTimer); window.__tbsToastTimer = setTimeout(() => toast.classList.remove('show'), 2000); };
+  const showToast = (message, tone = '') => { const toast = document.getElementById('toast'); if (!toast) return; toast.textContent = message; toast.classList.toggle('toast-success', tone === 'success'); toast.classList.add('show'); clearTimeout(window.__tbsToastTimer); window.__tbsToastTimer = setTimeout(() => { toast.classList.remove('show'); toast.classList.remove('toast-success'); }, 2000); };
   window.TBSShowToast = showToast;
   async function checkForUpdates(manual = false) {
     const now = Date.now(), last = Number(localStorage.getItem('lastUpdateCheck') || 0);
