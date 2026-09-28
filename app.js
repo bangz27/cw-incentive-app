@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appApi = window.capacitorApp?.App || window.Capacitor?.Plugins?.App;
     if (!appApi?.addListener) return;
     appApi.addListener('backButton', ({ canGoBack } = {}) => {
+      if (window.ModernSelectionSheet?.isOpen?.()) { window.ModernSelectionSheet.close(); return; }
       if (childViewIds.has(activeViewId) && navigationStack.length) { goBackInApp(); return; }
       if (canGoBack) { window.history.back(); return; }
       appApi.exitApp?.();
@@ -102,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchcancel', clearEdgeSwipe, { capture: true, passive: true });
   }
 
-  function fillForm(p) { [['profile-name', 'fullName'], ['profile-hub', 'hub'], ['profile-position', 'position']].forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.value = p?.[key] || ''; }); }
+  function fillForm(p) { [['profile-name', 'fullName'], ['profile-hub', 'hub'], ['profile-position', 'position']].forEach(([id, key]) => { const el = document.getElementById(id); if (el) { el.value = p?.[key] || ''; window.ModernSelectionSheet?.syncSelect?.(el); } }); }
   function renderProfile() { const p = current(), name = p.fullName || p.displayName || ''; const greeting = document.getElementById('home-greeting'); if (greeting) greeting.textContent = name ? `สวัสดี, ${name}` : 'เริ่มคำนวณรายได้ของคุณ'; document.querySelectorAll('#home-avatar,#profile-avatar').forEach(x => setAvatar(x, p)); const preview = document.getElementById('profile-preview-name'); if (preview) preview.textContent = name || 'ยังไม่ได้สร้างโปรไฟล์'; fillForm(p); }
 
   function renderHome() {
