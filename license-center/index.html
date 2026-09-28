@@ -47,6 +47,7 @@
         <button class="nav-item active" data-page="home"><span>⌂</span>ภาพรวม</button>
         <button class="nav-item" data-page="members"><span>◎</span>สมาชิก</button>
         <button class="nav-item" data-page="activity"><span>↳</span>ประวัติการทำรายการ</button>
+        <button class="nav-item" data-page="analytics"><span>▥</span>Download Analytics</button>
       </nav>
       <div class="side-bottom">
         <div class="signed-in"><span class="avatar" id="avatar">T</span><div><strong id="signedEmail">Owner</strong><small>Authorized</small></div></div>
@@ -97,6 +98,63 @@
             <div id="auditList"></div>
           </div>
         </div>
+
+        <div id="pageAnalytics" class="page hidden">
+          <div class="hero-row compact analytics-hero">
+            <div>
+              <span class="eyebrow">OWNER CONSOLE</span>
+              <h1>Download Analytics</h1>
+              <p>สรุปการดาวน์โหลดจาก QR tracking แบบไม่แสดง IP ดิบ</p>
+            </div>
+            <div class="analytics-actions">
+              <span id="analyticsLive" class="live-status"><span class="live-dot"></span>LIVE · 10s</span>
+              <button class="secondary-btn" id="analyticsRefresh" type="button">รีเฟรช <span>↻</span></button>
+              <button class="primary-btn" id="analyticsExport" type="button">Export CSV <span>↓</span></button>
+            </div>
+          </div>
+
+          <div class="analytics-controls search-card">
+            <label>ช่วงเวลา<select id="analyticsRange"><option value="24h">24 ชั่วโมง</option><option value="7d" selected>7 วัน</option><option value="30d">30 วัน</option><option value="90d">90 วัน</option></select></label>
+            <label>อุปกรณ์<select id="analyticsDevice"><option value="">ทุกอุปกรณ์</option></select></label>
+            <label>Campaign<select id="analyticsCampaign"><option value="">ทุก Campaign</option></select></label>
+            <label class="analytics-search">ค้นหา<input id="analyticsSearch" type="search" placeholder="ประเทศ / จังหวัด / เมือง / campaign"></label>
+          </div>
+
+          <p id="analyticsError" class="form-error analytics-error" role="alert"></p>
+          <div class="analytics-stats">
+            <div class="stat-card"><span>Total Downloads</span><strong id="analyticsTotal">—</strong><small>ทั้งหมดจาก API</small></div>
+            <div class="stat-card"><span>Today</span><strong id="analyticsToday">—</strong><small>วันนี้</small></div>
+            <div class="stat-card"><span>7 Days</span><strong id="analyticsWeek">—</strong><small>ย้อนหลัง 7 วัน</small></div>
+            <div class="stat-card"><span>30 Days</span><strong id="analyticsMonth">—</strong><small>ย้อนหลัง 30 วัน</small></div>
+          </div>
+
+          <div class="analytics-grid analytics-grid-main">
+            <section class="search-card analytics-map-card">
+              <div class="section-head"><div><span class="eyebrow">GEO DISTRIBUTION</span><h3>Download map</h3></div><span class="hint">Approximate IP geolocation</span></div>
+              <div id="analyticsMap" class="analytics-map" aria-label="แผนที่การดาวน์โหลดโดยประมาณ"></div>
+            </section>
+            <section class="search-card">
+              <div class="section-head"><div><span class="eyebrow">DEVICES</span><h3>Device distribution</h3></div></div>
+              <div id="analyticsDevices" class="analytics-bars"></div>
+            </section>
+          </div>
+
+          <div class="analytics-grid analytics-grid-secondary">
+            <section class="search-card analytics-chart-card">
+              <div class="section-head"><div><span class="eyebrow">TIMELINE</span><h3>Downloads over time</h3></div><span id="analyticsTimelineHint" class="hint">—</span></div>
+              <div id="analyticsTimeline" class="analytics-chart"></div>
+            </section>
+            <section class="search-card">
+              <div class="section-head"><div><span class="eyebrow">LOCATIONS</span><h3>Top locations</h3></div></div>
+              <div id="analyticsLocations" class="analytics-list"></div>
+            </section>
+          </div>
+
+          <section class="search-card analytics-activity-card">
+            <div class="section-head"><div><span class="eyebrow">RECENT ACTIVITY</span><h3>Recent activity</h3></div><span class="hint">ไม่แสดง IP address</span></div>
+            <div id="analyticsEvents" class="analytics-events"></div>
+          </section>
+        </div>
       </div>
     </main>
   </section>
@@ -122,5 +180,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
   <script src="app.js"></script>
+  <script src="download-analytics.js"></script>
+  <script src="download-analytics-ui.js"></script>
 </body>
 </html>

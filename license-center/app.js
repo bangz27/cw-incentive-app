@@ -8,6 +8,7 @@ const { createClient } = window.supabase;
 const db = createClient(CONFIG.url, CONFIG.publishableKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
+window.TBSLicenseCenter = Object.freeze({ db, config: CONFIG });
 
 let selected = null;
 const $ = s => document.querySelector(s);
@@ -41,7 +42,7 @@ async function boot(){
 }
 db.auth.onAuthStateChange((_event,session)=>{
   if(session?.user) ensureOwner();
-  else { $("#loginView").classList.remove("hidden"); $("#appView").classList.add("hidden"); }
+  else { window.TBSDownloadAnalyticsUI?.deactivate(); $("#loginView").classList.remove("hidden"); $("#appView").classList.add("hidden"); }
 });
 
 $("#loginForm").addEventListener("submit",async e=>{
@@ -57,16 +58,18 @@ $("#loginForm").addEventListener("submit",async e=>{
   finally{btn.disabled=false;}
 });
 $("#togglePassword").onclick=()=>{ const p=$("#password"); p.type=p.type==="password"?"text":"password"; $("#togglePassword").textContent=p.type==="password"?"ดู":"ซ่อน"; };
-$("#logoutBtn").onclick=async()=>{await db.auth.signOut();toast("ออกจากระบบแล้ว");};
+$("#logoutBtn").onclick=async()=>{window.TBSDownloadAnalyticsUI?.deactivate();await db.auth.signOut();toast("ออกจากระบบแล้ว");};
 
 const pages={
-  home:["OVERVIEW","ภาพรวม"],members:["MEMBERS","สมาชิก"],activity:["AUDIT TRAIL","ประวัติการทำรายการ"]
+  home:["OVERVIEW","ภาพรวม"],members:["MEMBERS","สมาชิก"],activity:["AUDIT TRAIL","ประวัติการทำรายการ"],analytics:["DOWNLOAD ANALYTICS","Download Analytics"]
 };
 $$(".nav-item").forEach(btn=>btn.onclick=()=>{
   const p=btn.dataset.page;
   $$(".nav-item").forEach(x=>x.classList.toggle("active",x===btn));
   Object.keys(pages).forEach(k=>$("#page"+k[0].toUpperCase()+k.slice(1)).classList.toggle("hidden",k!==p));
   $("#pageEyebrow").textContent=pages[p][0];$("#pageTitle").textContent=pages[p][1];
+  if(p==="analytics") window.TBSDownloadAnalyticsUI?.activate();
+  else window.TBSDownloadAnalyticsUI?.deactivate();
 });
 $$("[data-focus-search]").forEach(x=>x.onclick=()=>{document.querySelector('[data-page="members"]').click();setTimeout(()=>$("#searchEmail2").focus(),80)});
 
