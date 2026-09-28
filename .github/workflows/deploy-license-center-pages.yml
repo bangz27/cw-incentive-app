@@ -1,0 +1,55 @@
+name: Deploy TBS License Center to GitHub Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/v1.9
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout isolated License Center source
+        uses: actions/checkout@v4
+        with:
+          ref: feature/tbs-license-center-v1.9
+          path: source
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare website root
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s source/license-center/index.html
+          test -s source/license-center/style.css
+          test -s source/license-center/app.js
+          test -s source/license-center/README.md
+          mkdir -p site
+          cp -R source/license-center/. site/
+          touch site/.nojekyll
+          test -s site/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
