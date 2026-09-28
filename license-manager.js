@@ -20,7 +20,7 @@
     const plan = String(value.plan || '').toUpperCase();
     const status = String(value.status || '').toUpperCase();
     if (!PLANS[plan] || !STATUSES[status] || !value.user_id) return null;
-    return { user_id: String(value.user_id), email: String(value.email || ''), plan, status, started_at: value.started_at || null, expires_at: value.expires_at || null, granted_at: value.granted_at || null, updated_at: value.updated_at || null };
+    return { user_id: String(value.user_id), email: String(value.email || ''), plan, status, started_at: value.started_at || null, expires_at: value.expires_at || null, granted_at: value.granted_at || null, updated_at: value.updated_at || null, remaining_days: value.remaining_days ?? null, is_active: value.is_active === true };
   };
   const scopedGet = key => storage()?.getItem?.(key) || null;
   const scopedSet = (key, value) => storage()?.setItem?.(key, value);
@@ -47,8 +47,7 @@
     return state.license;
   }
 
-  function expiryMs(license = state.license) { return license?.expires_at ? Date.parse(license.expires_at) : null; }
-  function isExpired(license = state.license) { return license?.plan !== 'LIFETIME' && Number.isFinite(expiryMs(license)) && expiryMs(license) <= Date.now(); }
+  function isExpired(license = state.license) { return license?.status === STATUSES.EXPIRED; }
   function getStatus() {
     if (!state.license) return 'UNKNOWN';
     if (state.license.status === STATUSES.SUSPENDED) return STATUSES.SUSPENDED;
@@ -58,10 +57,10 @@
   function getRemainingDays() {
     const license = state.license;
     if (!license || license.plan === 'LIFETIME' || !license.expires_at) return license?.plan === 'LIFETIME' ? null : 0;
-    return Math.max(0, Math.ceil((expiryMs(license) - Date.now()) / 86400000));
+    return Number.isInteger(license.remaining_days) ? Math.max(0, license.remaining_days) : 0;
   }
   function getExpiryDate() { return state.license?.expires_at ? new Date(state.license.expires_at) : null; }
-  function isActive() { return Boolean(state.license && getStatus() === STATUSES.ACTIVE); }
+  function isActive() { return Boolean(state.license && getStatus() === STATUSES.ACTIVE && state.license.is_active === true); }
   function canUseApp() { return isActive(); }
   function getPlan() { return state.license?.plan || null; }
   function getLicense() { return state.license ? { ...state.license } : null; }
@@ -85,15 +84,16 @@
     try {
       const db = client();
       if (!db) throw new Error('ไม่พบ Supabase Client');
-      const { data, error } = await db.from('app_licenses').select(FIELDS).eq('user_id', user.id).limit(1).maybeSingle();
+      const { data, error } = await db.rpc('get_my_license_status');
       if (error) throw error;
-      const license = normalize(data);
+      const serverLicense = Array.isArray(data) ? data[0] : data;
+      const license = normalize({ ...serverLicense, user_id: user.id, email: user.email || '' });
       if (!license) throw new Error('ไม่พบ License ของบัญชีนี้');
       cacheLicense(license);
-      return setState(license, { online: true, loadedAt: Date.now(), error: null });
+      return setState(license, { online: true, loadedAt: null, error: null });
     } catch (error) {
       const cached = readCachedLicense();
-      return setState(cached, { online: false, error, loadedAt: Date.now() });
+      return setState(cached, { online: false, error, loadedAt: null });
     } finally { state.loading = false; }
   }
 
