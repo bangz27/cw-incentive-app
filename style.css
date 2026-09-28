@@ -310,3 +310,13 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 /* Suspended license exit: sign out before returning to Auth Gate */
 .suspended-login-button{margin-top:10px;background:var(--card);color:var(--orange-dark);border:1px solid var(--orange)}
 .suspended-login-button:hover{background:var(--orange-soft);color:var(--orange-dark)}
+
+/* V1.7.1 purchase/contact UI */
+.line-button{background:#06C755!important;color:#fff!important;border-color:#06C755!important}
+.line-button:hover{background:#05A947!important;color:#fff!important}
+.pricing-card-lifetime{border-color:#BBF7D0!important}
+.pricing-card-lifetime strong,.pricing-card-lifetime .eyebrow{color:#16A34A}
+.license-status-indicator{display:inline-flex;align-items:center;gap:6px}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 8px}
+.status-dot.status-active{background:#22C55E}
+.suspended-login-button{width:100%;min-height:48px;margin-top:10px;border:1px solid var(--border);border-radius:15px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px}

@@ -8,6 +8,7 @@
     LIFETIME: Object.freeze({ key: 'LIFETIME', label: 'LIFETIME', price: '79 บาท', duration: 'ตลอดชีพ' })
   });
   const STATUSES = Object.freeze({ ACTIVE: 'ACTIVE', EXPIRED: 'EXPIRED', SUSPENDED: 'SUSPENDED' });
+  const LINE_OA_URL = 'https://lin.ee/7WsyQ6W';
   const FIELDS = 'user_id,email,plan,status,started_at,expires_at,granted_at,updated_at';
   const CACHE_KEY = 'license-cache';
   const state = { license: null, userId: null, online: false, loading: false, error: null, loadedAt: 0 };
@@ -98,6 +99,10 @@
   }
 
   function setText(id, value) { const node = $(id); if (node) node.textContent = value; }
+  function openLineContact() {
+    const opened = global.open?.(LINE_OA_URL, '_blank', 'noopener,noreferrer');
+    if (!opened) global.location?.assign?.(LINE_OA_URL);
+  }
   function render() {
     const license = state.license;
     const status = getStatus();
@@ -106,6 +111,8 @@
     document?.documentElement?.classList.toggle('license-locked', !active);
     const summary = statusText(license);
     setText('license-plan-name', planTitle(license)); setText('license-status-text', summary);
+    const activeDot = $('[data-license-active-dot]');
+    activeDot?.classList.toggle('hidden', status !== STATUSES.ACTIVE);
     setText('license-expiry', license?.plan === 'LIFETIME' ? 'ใช้งานได้ตลอดชีพ' : `หมดอายุ ${formatDate(getExpiryDate())}`);
     setText('license-remaining', license?.plan === 'LIFETIME' ? 'ตลอดชีพ' : `${getRemainingDays()} วัน`);
     const warning = $('trial-warning');
@@ -121,6 +128,8 @@
   function bindUi() {
     global.addEventListener('licenseChanged', render);
     document.addEventListener('click', event => {
+      const lineTarget = event.target.closest?.('[data-line-contact]');
+      if (lineTarget) { event.preventDefault(); openLineContact(); return; }
       const target = event.target.closest?.('[data-license-refresh], [data-license-pricing]');
       if (!target) return;
       event.preventDefault();
