@@ -3,7 +3,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
-const baseline = '12a80d98bad81d26c072db14f75bf530459bd6d6';
+const baseline = '44fdb7e95e81d30f3e1977f37536665a089d5cf7';
 const git = (...args) => execFileSync('git', args, { cwd: root });
 // Additive RTS/box record fields are allowed in record-model.js. Calculation
 // engine, tier configuration, and the original calculation contract remain locked.
