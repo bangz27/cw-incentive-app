@@ -155,6 +155,7 @@
       setAuthenticated(session.user, session);
       await restoreProfileFromCloud(session.user);
       await syncProfile(); await syncRecords();
+      await global.TBSLicenseManager?.loadLicense?.();
       return session;
     })().finally(() => { authState.activation = null; });
     return authState.activation;
@@ -163,10 +164,10 @@
   async function init() {
     if (!config?.url || !config?.publishableKey || !supabaseLib?.createClient) { message('ไม่พบการตั้งค่า Supabase Client'); setAuthenticated(null); return; }
     authState.client = supabaseLib.createClient(config.url, config.publishableKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
-    authState.client.auth.onAuthStateChange((_event, session) => { if (session?.user) activateAuthenticatedSession(session).catch(error => console.warn('Supabase session activation failed:', error.message)); else { storage()?.clearUser(); setAuthenticated(null); } });
+    authState.client.auth.onAuthStateChange((_event, session) => { if (session?.user) activateAuthenticatedSession(session).catch(error => console.warn('Supabase session activation failed:', error.message)); else { storage()?.clearUser(); setAuthenticated(null); global.TBSLicenseManager?.loadLicense?.(); } });
     const { data, error } = await authState.client.auth.getSession();
     if (error) message('เชื่อมต่อระบบสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-    if (data?.session?.user) await activateAuthenticatedSession(data.session); else { storage()?.clearUser(); setAuthenticated(null); }
+    if (data?.session?.user) await activateAuthenticatedSession(data.session); else { storage()?.clearUser(); setAuthenticated(null); global.TBSLicenseManager?.loadLicense?.(); }
   }
 
   async function requireAuthenticatedSession(session) {
