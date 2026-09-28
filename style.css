@@ -320,3 +320,6 @@ h1,h2,p,.brand-lockup strong,.settings-row,.vehicle-card,.nav-item,.icon-button{
 .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 8px}
 .status-dot.status-active{background:#22C55E}
 .suspended-login-button{width:100%;min-height:48px;margin-top:10px;border:1px solid var(--border);border-radius:15px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* Expired-only renewal message */
+.expired-renewal-message{margin:16px 0 6px;color:var(--orange-dark);font-size:16px;font-weight:700;line-height:1.55;text-align:center}

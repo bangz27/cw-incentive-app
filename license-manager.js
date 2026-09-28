@@ -113,6 +113,8 @@
     setText('license-plan-name', planTitle(license)); setText('license-status-text', summary);
     const activeDot = $('[data-license-active-dot]');
     activeDot?.classList.toggle('hidden', status !== STATUSES.ACTIVE);
+    const renewalMessage = $('expired-renewal-message');
+    renewalMessage?.classList.toggle('hidden', status !== STATUSES.EXPIRED);
     setText('license-expiry', license?.plan === 'LIFETIME' ? 'ใช้งานได้ตลอดชีพ' : `หมดอายุ ${formatDate(getExpiryDate())}`);
     setText('license-remaining', license?.plan === 'LIFETIME' ? 'ตลอดชีพ' : `${getRemainingDays()} วัน`);
     const warning = $('trial-warning');

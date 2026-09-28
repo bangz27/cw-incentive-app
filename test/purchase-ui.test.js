@@ -35,3 +35,13 @@ test('active dot is shown only when the server-reported status is ACTIVE', () =>
   assert.match(manager, /status !== STATUSES\.ACTIVE/);
   assert.match(manager, /activeDot\?\.classList\.toggle\('hidden'/);
 });
+
+test('expired renewal message is shown only for EXPIRED status', () => {
+  const html = read('index.html');
+  const manager = read('license-manager.js');
+  assert.match(html, /id="expired-renewal-message"[^>]*class="expired-renewal-message hidden"/);
+  assert.match(html, /หมดอายุแล้ว ต่ออายุเหอะ เพื่อผู้พัฒนา ❤️/);
+  assert.match(manager, /renewalMessage\?\.classList\.toggle\('hidden', status !== STATUSES\.EXPIRED\)/);
+  assert.doesNotMatch(manager, /renewalMessage.*STATUSES\.ACTIVE/);
+  assert.doesNotMatch(manager, /renewalMessage.*STATUSES\.SUSPENDED/);
+});
