@@ -8,10 +8,10 @@ def signingPartial = releaseValues.values().any { it != null && !it.isEmpty() }
 if (signingPartial && !signingReady) {
     throw new GradleException('Incomplete CW release signing environment; provide all four variables.')
 }
-if (project.hasProperty('cwRequireSigning') && !signingReady) {
+def releaseRequested = gradle.startParameter.taskNames.any { task -> task.toLowerCase().contains('release') }
+if ((releaseRequested || project.hasProperty('cwRequireSigning')) && !signingReady) {
     throw new GradleException('Release signing required: configure CW_KEYSTORE_PATH, CW_KEYSTORE_PASSWORD, CW_KEY_ALIAS and CW_KEY_PASSWORD.')
 }
-
 android {
     namespace 'com.cw.incentive'
     compileSdk rootProject.ext.compileSdkVersion
@@ -34,6 +34,10 @@ android {
                 storePassword releaseValues.CW_KEYSTORE_PASSWORD
                 keyAlias releaseValues.CW_KEY_ALIAS
                 keyPassword releaseValues.CW_KEY_PASSWORD
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+                enableV4Signing true
             }
         }
     }
