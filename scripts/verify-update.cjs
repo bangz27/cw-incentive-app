@@ -19,11 +19,15 @@ const updateChecker = read('update-checker.js');
 assert(version.includes("version = '1.9.0'"), 'App version must be 1.9.0');
 assert(updateChecker.includes('compareVersions'), 'Numeric version comparison is missing');
 assert(updateChecker.includes('api.github.com/repos/bangz27/cw-incentive-app/releases/latest'), 'GitHub Releases API source missing');
+assert(updateChecker.includes('createBundledRelease'), 'Current-version fallback is missing');
+assert(updateChecker.includes("source: 'bundled-current'"), 'Stale remote release fallback is missing');
 assert(!app.includes("CURRENT_VERSION = '1.8.1'"), 'Legacy hard-coded current version remains');
 assert(html.includes('id="update-dialog"'), 'Update dialog is missing');
 assert(html.includes('id="update-dialog-changelog"'), 'Release changelog container is missing');
 assert(!app.includes('/releases/download/v1.5/'), 'Pinned legacy APK URL remains');
-assert(app.includes('cw-incentive-app/releases'), 'Share flow must use the GitHub Releases page');
+assert(!html.includes('id="profile-share"'), 'Share App card remains');
+assert(!app.includes('profile-share'), 'Share App handler remains');
+assert(!css.includes('.settings-leading.share'), 'Share App CSS remains');
 const requiredPresets = ['today', '2w', '4w-mid', '4w-end'];
 for (const preset of requiredPresets) {
   assert(html.includes(`data-range-preset="${preset}"`), `Missing Home preset: ${preset}`);

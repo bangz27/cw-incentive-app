@@ -24,6 +24,13 @@ const release = (overrides = {}) => ({
   ...overrides
 });
 
+const releaseFor = version => release({
+  tag_name: `v${version}`,
+  name: `TBS Incentive V${version}`,
+  html_url: `https://github.com/bangz27/cw-incentive-app/releases/tag/v${version}`,
+  assets: [{ name: `TBS-Incentive-v${version}.apk`, browser_download_url: `https://github.com/bangz27/cw-incentive-app/releases/download/v${version}/TBS-Incentive-v${version}.apk` }]
+});
+
 test('version comparison uses numeric SemVer ordering', () => {
   assert.equal(checker.compareVersions('1.10.0', '1.9.0'), 1);
   assert.equal(checker.compareVersions('1.9.1', '1.9.0'), 1);
@@ -52,13 +59,51 @@ test('current version lower than latest reports update available', async () => {
   assert.equal(result.release.body, '- ปรับปรุงระบบ');
 });
 
-test('current version higher than latest does not report an update', async () => {
+test('remote release older than current uses current version as effective latest', async () => {
   const result = await checker.createChecker({
     currentVersion: '1.11.0',
     storage: storageMock(),
-    fetchImpl: async () => response(release())
+    fetchImpl: async () => response(releaseFor('1.10.0'))
   }).check({ manual: true });
-  assert.equal(result.status, 'ahead');
+  assert.equal(result.status, 'latest');
+  assert.equal(result.latestVersion, '1.11.0');
+  assert.equal(result.release.version, '1.11.0');
+  assert.equal(result.release.source, 'bundled-current');
+  assert.equal(result.remoteRelease.version, '1.10.0');
+});
+
+test('current 1.9.0 with public latest 1.5.0 is up to date', async () => {
+  const result = await checker.createChecker({
+    currentVersion: '1.9.0',
+    storage: storageMock(),
+    fetchImpl: async () => response(releaseFor('1.5.0'))
+  }).check({ manual: true });
+  assert.equal(result.status, 'latest');
+  assert.equal(result.latestVersion, '1.9.0');
+  assert.equal(result.release.displayVersion, 'V1.9.0');
+});
+
+test('current 1.9.0 with public latest 1.9.0 is up to date', async () => {
+  const result = await checker.createChecker({
+    currentVersion: '1.9.0',
+    storage: storageMock(),
+    fetchImpl: async () => response(releaseFor('1.9.0'))
+  }).check({ manual: true });
+  assert.equal(result.status, 'latest');
+  assert.equal(result.latestVersion, '1.9.0');
+  assert.equal(result.release.source, 'github');
+});
+
+test('current 1.8.1 or 1.5.0 with latest 1.9.0 reports update available', async () => {
+  for (const currentVersion of ['1.8.1', '1.5.0']) {
+    const result = await checker.createChecker({
+      currentVersion,
+      storage: storageMock(),
+      fetchImpl: async () => response(releaseFor('1.9.0'))
+    }).check({ manual: true });
+    assert.equal(result.status, 'update-available');
+    assert.equal(result.latestVersion, '1.9.0');
+  }
 });
 
 test('GitHub API error is converted to a non-throwing error status', async () => {
@@ -108,6 +153,24 @@ test('automatic checks respect cooldown while manual checks bypass it', async ()
   assert.equal(manual.status, 'update-available');
   assert.equal(calls, 2);
   now += 10001;
+});
+
+test('stale cached 1.5 release is never shown as an update for current 1.9.0', async () => {
+  const storage = storageMock();
+  storage.setItem(checker.CACHE_KEY, JSON.stringify({ release: releaseFor('1.5.0') }));
+  storage.setItem(checker.LAST_CHECK_KEY, '1000');
+  let calls = 0;
+  const result = await checker.createChecker({
+    currentVersion: '1.9.0',
+    storage,
+    now: () => 1001,
+    fetchImpl: async () => { calls += 1; return response(releaseFor('1.5.0')); }
+  }).check();
+  assert.equal(result.status, 'latest');
+  assert.equal(result.fromCache, true);
+  assert.equal(result.latestVersion, '1.9.0');
+  assert.equal(result.release.version, '1.9.0');
+  assert.equal(calls, 0);
 });
 
 test('release notes and release URL are taken from the actual release payload', () => {

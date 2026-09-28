@@ -6,6 +6,7 @@
   'use strict';
 
   const RELEASES_API = 'https://api.github.com/repos/bangz27/cw-incentive-app/releases/latest';
+  const RELEASES_PAGE = 'https://github.com/bangz27/cw-incentive-app/releases';
   const CACHE_KEY = 'tbs_update_cache';
   const LAST_CHECK_KEY = 'lastUpdateCheck';
   const DEFAULT_COOLDOWN_MS = 24 * 60 * 60 * 1000;
@@ -31,6 +32,23 @@
   function normalizedVersion(value) {
     const parsed = parseVersion(value);
     return parsed ? parsed.join('.') : null;
+  }
+
+  function createBundledRelease(value) {
+    const version = normalizedVersion(value);
+    if (!version) return null;
+    return Object.freeze({
+      version,
+      displayVersion: `V${version}`,
+      tagName: `v${version}`,
+      name: `TBS Incentive V${version}`,
+      body: 'เวอร์ชันปัจจุบันของแอป',
+      htmlUrl: RELEASES_PAGE,
+      apkUrl: '',
+      downloadUrl: RELEASES_PAGE,
+      publishedAt: '',
+      source: 'bundled-current'
+    });
   }
 
   function isHttpUrl(value) {
@@ -60,7 +78,8 @@
       htmlUrl,
       apkUrl,
       downloadUrl: apkUrl || htmlUrl,
-      publishedAt: raw.published_at ? String(raw.published_at) : ''
+      publishedAt: raw.published_at ? String(raw.published_at) : '',
+      source: raw.source ? String(raw.source) : 'github'
     });
   }
 
@@ -104,6 +123,7 @@
     const getCurrentVersion = typeof options.currentVersion === 'function'
       ? options.currentVersion
       : () => options.currentVersion || global?.TBSAppVersion?.name || '1.9.0';
+    const getBundledRelease = () => createBundledRelease(getCurrentVersion());
 
     const normalizeCachedRelease = value => {
       const normalized = normalizeRelease(value);
@@ -135,14 +155,23 @@
 
     async function check({ manual = false, online = true } = {}) {
       const checkedAt = Number(now()) || Date.now();
+      const currentVersion = normalizedVersion(getCurrentVersion());
+      if (!currentVersion) return { status: 'error', checked: false, release: null, error: new Error('Invalid current app version') };
       const cachedRelease = readCachedRelease();
       const lastCheckedAt = getLastCheckedAt();
 
       if (!online) return { status: 'offline', checked: false, release: null };
       if (!manual && lastCheckedAt > 0 && checkedAt - lastCheckedAt < cooldownMs) {
-        return cachedRelease
-          ? { status: 'update-available', checked: false, fromCache: true, release: cachedRelease }
-          : { status: 'cooldown', checked: false, release: null };
+        const cachedComparison = cachedRelease ? compareVersions(cachedRelease.version, currentVersion) : null;
+        if (cachedComparison === 1) {
+          return { status: 'update-available', checked: false, fromCache: true, latestVersion: cachedRelease.version, release: cachedRelease };
+        }
+        const bundledRelease = getBundledRelease();
+        if (bundledRelease) {
+          writeCachedRelease(bundledRelease, checkedAt);
+          return { status: 'latest', checked: false, fromCache: true, source: 'bundled-current', latestVersion: currentVersion, release: bundledRelease };
+        }
+        return { status: 'cooldown', checked: false, release: null };
       }
       if (typeof fetchImpl !== 'function') return { status: 'error', checked: false, release: null, error: new Error('Fetch is unavailable') };
 
@@ -160,14 +189,21 @@
         }
         const release = normalizeRelease(raw);
         if (!release) throw new Error('Invalid GitHub release data');
-        const comparison = compareVersions(release.version, getCurrentVersion());
+        const comparison = compareVersions(release.version, currentVersion);
         if (comparison === null) throw new Error('Invalid current app version');
         if (comparison > 0) {
           writeCachedRelease(release, checkedAt);
-          return { status: 'update-available', checked: true, release };
+          return { status: 'update-available', checked: true, latestVersion: release.version, release };
         }
         safeRemove(storage, CACHE_KEY);
-        return { status: comparison < 0 ? 'ahead' : 'latest', checked: true, release };
+        if (comparison < 0) {
+          const bundledRelease = getBundledRelease();
+          if (bundledRelease) {
+            writeCachedRelease(bundledRelease, checkedAt);
+            return { status: 'latest', checked: true, source: 'bundled-current', latestVersion: currentVersion, remoteRelease: release, release: bundledRelease };
+          }
+        }
+        return { status: 'latest', checked: true, latestVersion: release.version, release };
       } catch (error) {
         return { status: 'error', checked: false, release: null, error };
       }
@@ -179,12 +215,14 @@
   const defaultChecker = createChecker();
   return Object.freeze({
     RELEASES_API,
+    RELEASES_PAGE,
     CACHE_KEY,
     LAST_CHECK_KEY,
     DEFAULT_COOLDOWN_MS,
     parseVersion,
     compareVersions,
     normalizedVersion,
+    createBundledRelease,
     isNewerVersion: (candidate, current) => compareVersions(candidate, current) === 1,
     normalizeRelease,
     createChecker,
