@@ -1,0 +1,39 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const root = path.resolve(__dirname, '..');
+const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+
+test('owner console uses server-side RPCs and does not expose a client-side owner allowlist', () => {
+  const source = read('owner-console.js');
+  assert.match(source, /owner_is_current_user/);
+  assert.match(source, /owner_search_license_users/);
+  assert.match(source, /owner_grant_monthly/);
+  assert.match(source, /owner_grant_lifetime/);
+  assert.match(source, /owner_suspend_license/);
+  assert.match(source, /owner_activate_license/);
+  assert.doesNotMatch(source, /97a8b8ef-53f4-422b-abf0-39247036a072/);
+  assert.doesNotMatch(source, /app_licenses/);
+});
+
+test('owner console is packaged and protected by the existing license gate', () => {
+  const html = read('index.html');
+  const build = read('scripts/build-web.cjs');
+  const gate = read('license-manager.js');
+  assert.match(html, /id="view-owner-console"/);
+  assert.match(html, /src="owner-console\.js"/);
+  assert.match(build, /'owner-console\.js'/);
+  assert.match(gate, /view-owner-console/);
+});
+
+test('owner migration binds the single owner UID and keeps audit tables inaccessible to clients', () => {
+  const sql = read('supabase/migrations/20260928170200_owner_license_console.sql');
+  assert.match(sql, /97a8b8ef-53f4-422b-abf0-39247036a072/);
+  assert.match(sql, /alter table public\.license_console_owners enable row level security/);
+  assert.match(sql, /alter table public\.license_audit_log enable row level security/);
+  assert.match(sql, /revoke all on table public\.license_audit_log from anon, authenticated/);
+  assert.match(sql, /using errcode = '42501'/);
+  assert.match(sql, /security definer/);
+});

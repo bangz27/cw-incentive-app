@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setTheme(localStorage.getItem('incentive_theme') || 'light');
   document.querySelector('.theme-toggle')?.addEventListener('click', () => setTheme(root.dataset.theme === 'dark' ? 'light' : 'dark'));
 
-  const rootViewIds = new Set(['view-home', 'view-calculator', 'view-profile', 'view-history', 'view-settings']);
+  const rootViewIds = new Set(['view-home', 'view-calculator', 'view-profile', 'view-history', 'view-settings', 'view-owner-console']);
   const childViewIds = new Set(['view-guide', 'view-payment-details', 'view-payment-detail', 'view-support', 'view-about', 'view-contact']);
   const navigationStack = [];
   let activeViewId = 'view-home';
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.toggle('active', v.id === safeTarget));
     document.querySelector('.app-shell')?.classList.toggle('calculator-fixed-layer', safeTarget === 'view-calculator');
     document.querySelectorAll('[data-target]').forEach(n => n.classList.toggle('active', n.dataset.target === safeTarget && n.classList.contains('nav-item')));
-    const contexts = {'view-home':['TBS Incentive','สรุปรายได้ของคุณ'],'view-calculator':['TBS Incentive','เลือกตำแหน่งจัดส่ง'],'view-profile':['TBS Incentive','Profile • ข้อมูลของฉัน'],'view-history':['TBS Incentive','รายการ • ประวัติคำนวณ'],'view-settings':['TBS Incentive','Setting • ตั้งค่าและข้อมูลเพิ่มเติม'],'view-guide':['TBS Incentive','คู่มือการใช้งาน'],'view-payment-details':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-payment-detail':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-support':['TBS Incentive','สนับสนุนค่ากาแฟ'],'view-about':['TBS Incentive','นโยบายความเป็นส่วนตัว'],'view-contact':['TBS Incentive','ข้อมูลการติดต่อ']};
+    const contexts = {'view-home':['TBS Incentive','สรุปรายได้ของคุณ'],'view-calculator':['TBS Incentive','เลือกตำแหน่งจัดส่ง'],'view-profile':['TBS Incentive','Profile • ข้อมูลของฉัน'],'view-history':['TBS Incentive','รายการ • ประวัติคำนวณ'],'view-settings':['TBS Incentive','Setting • ตั้งค่าและข้อมูลเพิ่มเติม'],'view-owner-console':['TBS License Console','Owner-only license management'],'view-guide':['TBS Incentive','คู่มือการใช้งาน'],'view-payment-details':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-payment-detail':['TBS Incentive','รายละเอียดการทำจ่าย'],'view-support':['TBS Incentive','สนับสนุนค่ากาแฟ'],'view-about':['TBS Incentive','นโยบายความเป็นส่วนตัว'],'view-contact':['TBS Incentive','ข้อมูลการติดต่อ']};
     const context = contexts[safeTarget] || contexts['view-home'];
     const title = document.getElementById('header-title'), subtitle = document.getElementById('header-subtitle'), refresh = document.getElementById('header-refresh');
     if (title) title.textContent = context[0]; if (subtitle) subtitle.textContent = context[1]; refresh?.classList.toggle('hidden', safeTarget !== 'view-calculator');
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     recent.className = 'stack-list'; recent.innerHTML = records.slice(0, 3).map(r => `<div class="record-card"><span class="record-icon material-icons-round">${r.vehicleType === '2W' ? 'two_wheeler' : 'local_shipping'}</span><div><strong>${r.vehicleType} · Zone ${r.zone}</strong><small>${Number(r.parcel || 0).toLocaleString()} ส่งสำเร็จ · ${r.date}</small></div><div class="record-money">${money(Number(r.netIncentive) || 0)}<small>หัก ${money(Number(r.sameAddressDeduction) || 0)}</small></div></div>`).join('');
   }
 
-  const CURRENT_VERSION = '1.7.0';
+  const CURRENT_VERSION = '1.7.1';
   const RELEASES_API = 'https://api.github.com/repos/bangz27/cw-incentive-app/releases/latest';
   const parseVersion = value => String(value || '').replace(/^v/i, '').split('.').map(x => Number.parseInt(x, 10) || 0).slice(0, 3);
   const newerThanCurrent = value => { const a = parseVersion(value), b = parseVersion(CURRENT_VERSION); return a.some((n, i) => n !== b[i] && n > b[i]) && a.map((n, i) => n - b[i]).find(n => n) > 0; };

@@ -132,7 +132,7 @@
       const mutation = event.target.closest?.('#btn-save, [data-edit-record], [data-delete-record]');
       if (mutation && !canUseApp()) { event.preventDefault(); event.stopImmediatePropagation(); render(); return; }
       if (!nav || canUseApp()) return;
-      const allowed = new Set(['view-profile', 'view-settings', 'view-payment-details', 'view-payment-detail', 'view-support', 'view-about', 'view-contact']);
+      const allowed = new Set(['view-profile', 'view-settings', 'view-owner-console', 'view-payment-details', 'view-payment-detail', 'view-support', 'view-about', 'view-contact']);
       if (!allowed.has(nav.dataset.target)) { event.preventDefault(); event.stopImmediatePropagation(); render(); }
     }, true);
     render();
