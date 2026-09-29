@@ -1,7 +1,6 @@
 const CONFIG = {
   url: "https://cqzuhwzvxrmlezfkbpwv.supabase.co",
-  publishableKey: "sb_publishable__mI4pr_ajeeUng7MOtrl9Q_9f5oTzfE",
-  ownerUid: "97a8b8ef-53f4-422b-abf0-39247036a072"
+  publishableKey: "sb_publishable__mI4pr_ajeeUng7MOtrl9Q_9f5oTzfE"
 };
 
 const { createClient } = window.supabase;
@@ -22,9 +21,10 @@ function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("sh
 function setLoginError(msg){ $("#loginError").textContent=msg||""; }
 
 async function ensureOwner(){
-  const {data:{user}} = await db.auth.getUser();
-  if(!user) return false;
-  if(user.id !== CONFIG.ownerUid){
+  const {data:{user}, error:userError} = await db.auth.getUser();
+  if(userError || !user) return false;
+  const {data:isOwner, error:ownerError} = await db.rpc("owner_is_current_user");
+  if(ownerError || isOwner !== true){
     await db.auth.signOut();
     setLoginError("บัญชีนี้ไม่ได้รับสิทธิ์เข้าศูนย์จัดการ");
     return false;

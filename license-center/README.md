@@ -8,7 +8,7 @@ The UI intentionally avoids the phrase "Owner Console".
 
 ## Current backend baseline
 - Supabase project: `cqzuhwzvxrmlezfkbpwv`
-- Owner UID: `97a8b8ef-53f4-422b-abf0-39247036a072`
+- Owner authorization: resolved server-side from the authenticated Supabase user
 - App baseline: TBS Incentive v1.9.0
 - Client uses Supabase Publishable Key only. No service_role key.
 
