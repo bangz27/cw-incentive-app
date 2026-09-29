@@ -59,8 +59,8 @@
     const city = text(read(source, ['city', 'city_name', 'town']));
     const campaign = text(read(row, ['campaign', 'campaign_name', 'campaignName', 'source']));
     const device = text(read(row, ['device', 'device_type', 'deviceType', 'platform', 'user_device']));
-    const label = text(read(row, kind === 'device' ? ['device', 'device_type', 'deviceType', 'platform', 'name', 'label'] : kind === 'campaign' ? ['campaign', 'campaign_name', 'campaignName', 'name', 'label'] : ['label', 'name', 'location', 'city', 'province', 'country'])) || city || province || country || 'ไม่ระบุ';
-    const timestamp = text(read(row, ['created_at', 'timestamp', 'date', 'datetime', 'time', 'occurred_at']));
+    const label = text(read(row, kind === 'device' ? ['device', 'device_type', 'deviceType', 'platform', 'name', 'label'] : kind === 'campaign' ? ['campaign', 'campaign_name', 'campaignName', 'name', 'label'] : ['label', 'name', 'location', 'date', 'city', 'province', 'country'])) || city || province || country || 'ไม่ระบุ';
+    const timestamp = text(read(row, ['created_at', 'timestamp', 'scanned_at', 'date', 'datetime', 'time', 'occurred_at']));
     const latitude = number(read(source, ['latitude', 'lat']));
     const longitude = number(read(source, ['longitude', 'lng', 'lon']));
     return Object.freeze({
