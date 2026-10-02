@@ -10,10 +10,24 @@ test('download tracking is click-gated and does not write on GET/HEAD', () => {
   const source = read('supabase/functions/tbs-download-v15/index.ts');
   assert.match(source, /req\.method === "GET"/);
   assert.match(source, /req\.method === "HEAD"/);
+  assert.match(source, /status: 302/);
+  assert.match(source, /download\.html/);
   assert.match(source, /button\.addEventListener\("click"/);
   assert.match(source, /navigator\.geolocation\.getCurrentPosition/);
   assert.match(source, /method: "POST"/);
   assert.match(source, /download_id/);
+});
+
+test('static download page renders in browser and posts GPS only after click', () => {
+  const page = read('license-center/download.html');
+  assert.match(page, /<title>ดาวน์โหลด TBS Incentive<\/title>/);
+  assert.match(page, /tbs-download-v15/);
+  assert.match(page, /crypto\.randomUUID/);
+  assert.match(page, /button\.addEventListener\(['"]click['"]\s*,/);
+  assert.match(page, /navigator\.geolocation\.getCurrentPosition/);
+  assert.match(page, /location_permission/);
+  assert.match(page, /method: 'POST'/);
+  assert.doesNotMatch(page, /SUPABASE_SERVICE_ROLE_KEY|service_role|access_token/);
 });
 
 test('download tracking records permission outcomes and persists validated browser GPS coordinates', () => {
