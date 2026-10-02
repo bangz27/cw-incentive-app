@@ -61,6 +61,29 @@ test('Download Analytics filters by device, campaign and search text', () => {
   assert.equal(filtered.events[0].city, 'Bangkok');
 });
 
+test('Download Analytics preserves coordinates and formats scanned_at in Thailand time', () => {
+  const data = analytics.normalizePayload({
+    events: [{
+      scanned_at: '2026-10-02T04:08:26.244Z',
+      latitude: 13.749976,
+      longitude: 100.516819,
+      province: 'กรุงเทพมหานคร',
+      district: 'ปทุมวัน',
+      subdistrict: 'ลุมพินี',
+      download_source: 'qr',
+      device: 'Android'
+    }]
+  });
+  assert.equal(data.events[0].latitude, 13.749976);
+  assert.equal(data.events[0].longitude, 100.516819);
+  assert.equal(analytics.formatThailandDateTime(data.events[0].timestamp), '📅 02-ตุลาคม-2569 🕟 11:08 🇹🇭');
+  const ui = read('license-center/download-analytics-ui.js');
+  assert.match(ui, /coordinatesText/);
+  assert.match(ui, /formatThailandDateTime/);
+  assert.match(ui, /Source:/);
+  assert.match(ui, /Platform:/);
+});
+
 test('License Center wires analytics page, owner session and protected endpoint', () => {
   const html = read('license-center/index.html');
   const app = read('license-center/app.js');

@@ -17,6 +17,9 @@
   const formatNumber = value => new Intl.NumberFormat('en-US').format(Number(value) || 0);
   const text = value => String(value ?? '').trim() || '—';
   const locationText = row => [row.subdistrict, row.district, row.province, row.city, row.country].filter(Boolean).filter((value, index, values) => values.indexOf(value) === index).join(' · ') || 'ไม่ระบุพื้นที่';
+  const coordinatesText = row => Number.isFinite(row.latitude) && Number.isFinite(row.longitude)
+    ? `📍 ${row.latitude.toFixed(6)}, ${row.longitude.toFixed(6)}`
+    : '📍 ไม่พบพิกัด GPS';
   const sum = rows => (rows || []).reduce((total, row) => total + (Number(row.count) || 0), 0);
 
   function setLive(status, tone = 'live') {
@@ -135,17 +138,17 @@
     const sorted = [...rows].sort((a, b) => b.count - a.count).slice(0, 8);
     if (!sorted.length) return renderEmpty('analyticsLocations');
     target.innerHTML = sorted.map((row, index) => `<div class="analytics-list-row">
-      <span class="analytics-rank">${index + 1}</span><div><b>${esc(text(row.label))}</b><small>${esc(locationText(row))}</small></div><strong>${formatNumber(row.count)}</strong>
+      <span class="analytics-rank">${index + 1}</span><div><b>${esc(text(row.label))}</b><small>${esc(locationText(row))}</small><small class="analytics-coordinates">${esc(coordinatesText(row))}</small></div><strong>${formatNumber(row.count)}</strong>
     </div>`).join('');
   }
 
   function renderEvents(rows) {
     const target = $('analyticsEvents');
     if (!target) return;
-    const sorted = [...rows].sort((a, b) => String(b.timestamp).localeCompare(String(a.timestamp))).slice(0, 12);
+    const sorted = [...rows].sort((a, b) => (Date.parse(b.timestamp) || 0) - (Date.parse(a.timestamp) || 0)).slice(0, 12);
     if (!sorted.length) return renderEmpty('analyticsEvents');
     target.innerHTML = sorted.map(row => `<div class="analytics-event-row">
-      <div class="analytics-event-icon">↓</div><div><b>${esc(locationText(row))}</b><small>${esc(text(row.campaign || row.label))} · ${esc(text(row.device))}</small></div><time>${esc(text(row.timestamp))}</time><strong>${formatNumber(row.count)}</strong>
+      <div class="analytics-event-icon">↓</div><div><b>${esc(locationText(row))}</b><small>Campaign: ${esc(text(row.campaign || row.label))} · Source: ${esc(text(row.downloadSource || row.source))} · Platform: ${esc(text(row.device || row.platform))}</small><small class="analytics-coordinates">${esc(coordinatesText(row))}</small></div><time>${esc(core.formatThailandDateTime(row.timestamp))}</time><strong>${formatNumber(row.count)}</strong>
     </div>`).join('');
   }
 
