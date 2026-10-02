@@ -9,6 +9,7 @@
   const POLL_MS = 10000;
   const RANGE_MS = { '24h': 24 * 60 * 60 * 1000, '7d': 7 * 24 * 60 * 60 * 1000, '30d': 30 * 24 * 60 * 60 * 1000, '90d': 90 * 24 * 60 * 60 * 1000 };
   const NUMBER_KEYS = ['count', 'total', 'scans', 'downloads', 'value', 'events', 'download_count', 'scan_count'];
+  const THAILAND_TIME_ZONE = 'Asia/Bangkok';
 
   function asRows(value) {
     if (Array.isArray(value)) return value.filter(row => row && typeof row === 'object');
@@ -63,8 +64,10 @@
     const device = text(read(row, ['device', 'device_type', 'deviceType', 'platform', 'user_device']));
     const label = text(read(row, kind === 'device' ? ['device', 'device_type', 'deviceType', 'platform', 'name', 'label'] : kind === 'campaign' ? ['campaign', 'campaign_name', 'campaignName', 'name', 'label'] : ['label', 'name', 'subdistrict', 'district', 'city', 'province', 'country'])) || subdistrict || district || city || province || country || 'ไม่ระบุ';
     const timestamp = text(read(row, ['created_at', 'timestamp', 'scanned_at', 'date', 'datetime', 'time', 'occurred_at']));
-    const latitude = number(read(source, ['latitude', 'lat']));
-    const longitude = number(read(source, ['longitude', 'lng', 'lon']));
+    const rawLatitude = read(source, ['latitude', 'lat']);
+    const rawLongitude = read(source, ['longitude', 'lng', 'lon']);
+    const latitude = rawLatitude === '' ? null : number(rawLatitude);
+    const longitude = rawLongitude === '' ? null : number(rawLongitude);
     return Object.freeze({
       label,
       count: rowCount(row),
@@ -77,10 +80,12 @@
       city,
       locationPermission: text(read(row, ['location_permission', 'permission'])),
       downloadSource: text(read(row, ['download_source', 'source'])),
+      source: text(read(row, ['source', 'download_source'])),
       apkVersion: text(read(row, ['apk_version', 'version'])),
+      platform: device,
       timestamp,
-      latitude: latitude || null,
-      longitude: longitude || null,
+      latitude,
+      longitude,
       kind
     });
   }
@@ -141,6 +146,22 @@
     return [...new Set((rows || []).map(row => row.label).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   }
 
+  function formatThailandDateTime(value) {
+    const date = new Date(value);
+    if (!value || Number.isNaN(date.getTime())) return '—';
+    const parts = new Intl.DateTimeFormat('th-TH-u-ca-buddhist', {
+      timeZone: THAILAND_TIME_ZONE,
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23'
+    }).formatToParts(date);
+    const values = Object.fromEntries(parts.filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
+    return `📅 ${values.day}-${values.month}-${values.year} 🕟 ${values.hour}:${values.minute} 🇹🇭`;
+  }
+
   function csvCell(value) {
     let cell = String(value ?? '').replace(/[\r\n]+/g, ' ').trim();
     if (/^[=+\-@]/.test(cell)) cell = `'${cell}`;
@@ -188,5 +209,5 @@
     };
   }
 
-  return Object.freeze({ API_URL, POLL_MS, RANGE_MS, normalizePayload, filterData, uniqueLabels, eventsToCsv, queryString, createApi });
+  return Object.freeze({ API_URL, POLL_MS, RANGE_MS, normalizePayload, filterData, uniqueLabels, formatThailandDateTime, eventsToCsv, queryString, createApi });
 });

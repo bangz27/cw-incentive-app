@@ -16,13 +16,15 @@ test('download tracking is click-gated and does not write on GET/HEAD', () => {
   assert.match(source, /download_id/);
 });
 
-test('download tracking records permission outcomes and never inserts browser GPS coordinates', () => {
+test('download tracking records permission outcomes and persists validated browser GPS coordinates', () => {
   const source = read('supabase/functions/tbs-download-v15/index.ts');
   assert.match(source, /granted.*denied.*timeout.*unavailable/s);
   assert.match(source, /location_permission: permission/);
   const eventBlock = source.match(/db\.from\("qr_scan_events"\)\.upsert\(([\s\S]*?)\}, \{ onConflict: "download_id"/)?.[1] || '';
-  assert.doesNotMatch(eventBlock, /latitude\s*:/);
-  assert.doesNotMatch(eventBlock, /longitude\s*:/);
+  assert.match(source, /const gpsLatitude = permission === "granted" \? Number\(latitude\) : null/);
+  assert.match(source, /const gpsLongitude = permission === "granted" \? Number\(longitude\) : null/);
+  assert.match(eventBlock, /latitude:\s*gpsLatitude/);
+  assert.match(eventBlock, /longitude:\s*gpsLongitude/);
 });
 
 test('server-side reverse geocoding follows Nominatim policy basics', () => {
@@ -45,10 +47,16 @@ test('schema keeps old event rows compatible and adds idempotent location metada
   assert.match(migration, /enable row level security/);
 });
 
-test('dashboard exposes derived area fields without requiring raw GPS for new events', () => {
+test('dashboard exposes GPS, area, source/platform fields and newest-first ordering', () => {
   const dashboard = read('supabase/functions/tbs-download-dashboard/index.ts');
   assert.match(dashboard, /province,district,subdistrict/);
   assert.match(dashboard, /row\.province \|\| row\.region/);
   assert.match(dashboard, /row\.district \|\| row\.city/);
   assert.match(dashboard, /subdistrict/);
+  assert.match(dashboard, /latitude: row\.latitude/);
+  assert.match(dashboard, /longitude: row\.longitude/);
+  assert.match(dashboard, /source: row\.download_source/);
+  assert.match(dashboard, /platform: deviceOf\(row\.user_agent\)/);
+  assert.match(dashboard, /order.*scanned_at\.desc/s);
+  assert.match(dashboard, /\.sort\(\(left: any, right: any\)/);
 });

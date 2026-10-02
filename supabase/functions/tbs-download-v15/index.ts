@@ -70,7 +70,8 @@ function areaFromAddress(address: Record<string, unknown> = {}) {
 
 async function reverseGeocode(db: ReturnType<typeof createClient>, latitude: number, longitude: number) {
   // Three decimals are intentionally used as a coarse cache key and lookup coordinate.
-  // New raw GPS coordinates are never persisted or sent at full precision to Nominatim.
+  // Reverse geocoding uses a coarse lookup, while validated browser GPS coordinates
+  // are persisted separately in qr_scan_events.
   const coarseLatitude = Number(latitude.toFixed(3));
   const coarseLongitude = Number(longitude.toFixed(3));
   const cacheKey = `${coarseLatitude.toFixed(3)},${coarseLongitude.toFixed(3)}`;
@@ -261,6 +262,8 @@ Deno.serve(async (req: Request) => {
   const subdistrict = text(area.subdistrict, 160) || null;
   const country = text(area.country, 160) || null;
   const countryCode = text(area.country_code, 12) || null;
+  const gpsLatitude = permission === "granted" ? Number(latitude) : null;
+  const gpsLongitude = permission === "granted" ? Number(longitude) : null;
 
   const { error: insertError } = await db.from("qr_scan_events").upsert({
     download_id: downloadId,
@@ -274,7 +277,8 @@ Deno.serve(async (req: Request) => {
     subdistrict,
     country,
     country_code: countryCode,
-    // Preserve dashboard compatibility without persisting new raw GPS coordinates.
+    latitude: gpsLatitude,
+    longitude: gpsLongitude,
     region: province,
     city: district,
     referrer: text(body.referrer || req.headers.get("referer"), 500) || null,

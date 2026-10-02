@@ -77,7 +77,12 @@ Deno.serve(async (req: Request) => {
   });
   if (!response.ok) return json({ error: "Database query failed" }, 502);
 
-  const rows = await response.json();
+  const rawRows = await response.json();
+  const rows = (Array.isArray(rawRows) ? rawRows : []).sort((left: any, right: any) => {
+    const rightTime = Date.parse(right?.scanned_at || "");
+    const leftTime = Date.parse(left?.scanned_at || "");
+    return (Number.isFinite(rightTime) ? rightTime : 0) - (Number.isFinite(leftTime) ? leftTime : 0);
+  });
   const now = Date.now();
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
@@ -100,8 +105,8 @@ Deno.serve(async (req: Request) => {
       subdistrict: subdistrict || null,
       city: row.city || district || null,
       country_code: row.country_code || null,
-      // Existing legacy rows may contain approximate IP coordinates. New browser-derived
-      // rows intentionally leave these fields null to avoid returning raw GPS.
+      // Legacy rows may contain approximate IP coordinates; browser-derived rows now
+      // return the validated GPS coordinates persisted by the tracking function.
       latitude: typeof row.latitude === "number" ? row.latitude : null,
       longitude: typeof row.longitude === "number" ? row.longitude : null,
       scans: 0,
@@ -143,11 +148,13 @@ Deno.serve(async (req: Request) => {
     city: row.city,
     location_permission: row.location_permission,
     download_source: row.download_source,
+    source: row.download_source,
     apk_version: row.apk_version,
     latitude: row.latitude,
     longitude: row.longitude,
     timezone: row.timezone,
     device: deviceOf(row.user_agent),
+    platform: deviceOf(row.user_agent),
     referrer: row.referrer,
   }));
 
