@@ -4,7 +4,7 @@
 
 ## สถานะ
 
-**Backend Implemented / Deployed — GitHub Pages UI deployment pending จาก GitHub push permission 403**
+**Implemented / Deployed — Backend, GitHub Pages UI และ Download Page ตรวจผ่านแล้ว**
 
 Live download write test ยังไม่ถูกยิงเพื่อไม่เพิ่มข้อมูลทดสอบใน production analytics
 
@@ -144,16 +144,25 @@ References:
 - ไม่แก้ QR function อื่น
 - Direct GitHub APK URL ยังไม่ผ่าน Download Page จึงไม่บันทึก Browser permission; flow นี้ใช้กับ QR/Tracking URL เดิม
 
-## GitHub Pages deployment boundary
+## GitHub Pages deployment
 
-Backend Edge Functions และ Supabase migration deploy สำเร็จแล้ว แต่ source commit `0902296b609bd92357eafd0caaa14dd1d922ccb4` ยังอยู่ local บน `feature/v1.9` เพราะ `git push` ถูกปฏิเสธด้วย HTTP 403:
+ก่อนหน้านี้มี push permission 403 ชั่วคราว แต่ซิงก์ source branch และ deploy สำเร็จแล้ว
+
+- Pages source branch: `feature/tbs-license-center-v1.9`
+- Pages source commit: `4548df7463434b0b866d9e9a865432e5b90846c1`
+- Workflow run: https://github.com/bangz27/cw-incentive-app/actions/runs/36985370584
+- Production URL: https://bangz27.github.io/cw-incentive-app/
+- Production UI contract: **PASS**
+- Download Page contract: **PASS**
+
+หลักฐาน error เดิมก่อนแก้:
 
 ```text
 remote: Permission to bangz27/cw-incentive-app.git denied to bangz27.
 fatal: unable to access ... error: 403
 ```
 
-ดังนั้น GitHub Pages ยังใช้ UI รุ่นก่อนจนกว่าจะ push commit นี้ด้วย GitHub credential ที่มีสิทธิ์เขียน repository
+หลังซิงก์ source branch แล้ว workflow checkout ไฟล์ใหม่และ deploy หน้า Production สำเร็จ
 
 ## Known inspection event
 
