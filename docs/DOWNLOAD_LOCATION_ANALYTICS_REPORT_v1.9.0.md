@@ -4,7 +4,9 @@
 
 ## สถานะ
 
-**Implemented / Deployed — Live download write test ยังไม่ถูกยิงเพื่อไม่เพิ่มข้อมูลทดสอบใน production analytics**
+**Backend Implemented / Deployed — GitHub Pages UI deployment pending จาก GitHub push permission 403**
+
+Live download write test ยังไม่ถูกยิงเพื่อไม่เพิ่มข้อมูลทดสอบใน production analytics
 
 ## Objective
 
@@ -141,6 +143,17 @@ References:
 - ไม่แก้ package name, version code หรือ signing
 - ไม่แก้ QR function อื่น
 - Direct GitHub APK URL ยังไม่ผ่าน Download Page จึงไม่บันทึก Browser permission; flow นี้ใช้กับ QR/Tracking URL เดิม
+
+## GitHub Pages deployment boundary
+
+Backend Edge Functions และ Supabase migration deploy สำเร็จแล้ว แต่ source commit `0902296b609bd92357eafd0caaa14dd1d922ccb4` ยังอยู่ local บน `feature/v1.9` เพราะ `git push` ถูกปฏิเสธด้วย HTTP 403:
+
+```text
+remote: Permission to bangz27/cw-incentive-app.git denied to bangz27.
+fatal: unable to access ... error: 403
+```
+
+ดังนั้น GitHub Pages ยังใช้ UI รุ่นก่อนจนกว่าจะ push commit นี้ด้วย GitHub credential ที่มีสิทธิ์เขียน repository
 
 ## Known inspection event
 
