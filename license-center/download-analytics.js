@@ -56,10 +56,12 @@
     const source = location && typeof location === 'object' ? { ...row, ...location } : row;
     const country = text(read(source, ['country', 'country_name', 'countryName']));
     const province = text(read(source, ['province', 'region', 'state', 'region_name']));
-    const city = text(read(source, ['city', 'city_name', 'town']));
+    const district = text(read(source, ['district', 'amphoe', 'city_district', 'county']));
+    const subdistrict = text(read(source, ['subdistrict', 'tambon', 'suburb', 'village']));
+    const city = text(read(source, ['city', 'city_name', 'town'])) || district;
     const campaign = text(read(row, ['campaign', 'campaign_name', 'campaignName', 'source']));
     const device = text(read(row, ['device', 'device_type', 'deviceType', 'platform', 'user_device']));
-    const label = text(read(row, kind === 'device' ? ['device', 'device_type', 'deviceType', 'platform', 'name', 'label'] : kind === 'campaign' ? ['campaign', 'campaign_name', 'campaignName', 'name', 'label'] : ['label', 'name', 'location', 'date', 'city', 'province', 'country'])) || city || province || country || 'ไม่ระบุ';
+    const label = text(read(row, kind === 'device' ? ['device', 'device_type', 'deviceType', 'platform', 'name', 'label'] : kind === 'campaign' ? ['campaign', 'campaign_name', 'campaignName', 'name', 'label'] : ['label', 'name', 'subdistrict', 'district', 'city', 'province', 'country'])) || subdistrict || district || city || province || country || 'ไม่ระบุ';
     const timestamp = text(read(row, ['created_at', 'timestamp', 'scanned_at', 'date', 'datetime', 'time', 'occurred_at']));
     const latitude = number(read(source, ['latitude', 'lat']));
     const longitude = number(read(source, ['longitude', 'lng', 'lon']));
@@ -70,7 +72,12 @@
       device,
       country,
       province,
+      district,
+      subdistrict,
       city,
+      locationPermission: text(read(row, ['location_permission', 'permission'])),
+      downloadSource: text(read(row, ['download_source', 'source'])),
+      apkVersion: text(read(row, ['apk_version', 'version'])),
       timestamp,
       latitude: latitude || null,
       longitude: longitude || null,
@@ -103,7 +110,7 @@
   }
 
   function rowSearchText(row) {
-    return [row.label, row.campaign, row.device, row.country, row.province, row.city].join(' ').toLowerCase();
+    return [row.label, row.campaign, row.device, row.country, row.province, row.district, row.subdistrict, row.city].join(' ').toLowerCase();
   }
 
   function matches(row, filters, start) {
@@ -141,8 +148,8 @@
   }
 
   function eventsToCsv(events) {
-    const header = ['Download Time', 'Country', 'Province', 'City', 'Campaign', 'Device', 'Count'];
-    const rows = (events || []).map(row => [row.timestamp, row.country, row.province, row.city, row.campaign, row.device, row.count]);
+    const header = ['Download Time', 'Country', 'Province', 'District', 'Subdistrict', 'City', 'Campaign', 'Device', 'Location Permission', 'APK Version', 'Download Source', 'Count'];
+    const rows = (events || []).map(row => [row.timestamp, row.country, row.province, row.district, row.subdistrict, row.city, row.campaign, row.device, row.locationPermission, row.apkVersion, row.downloadSource, row.count]);
     return [header, ...rows].map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
   }
 

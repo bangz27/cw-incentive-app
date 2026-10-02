@@ -43,14 +43,10 @@ Deno.serve(async (req: Request) => {
   const publicKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || serviceKey;
   if (!supabaseUrl || !serviceKey || !publicKey) return json({ error: "Server configuration error" }, 500);
 
-  // Verify the presented JWT first. The user.id from this response is the only identity used below.
   const admin = createClient(supabaseUrl, serviceKey);
   const { data: userData, error: userError } = await admin.auth.getUser(token);
   if (userError || !userData.user?.id) return json({ error: "Invalid session" }, 401);
-  const authenticatedUserId = userData.user.id;
 
-  // The RPC performs the authoritative lookup in public.license_console_owners using auth.uid().
-  // This avoids relying on a client-side UUID or on a direct table read that may be affected by RLS.
   const userDb = createClient(supabaseUrl, publicKey, {
     global: { headers: { Authorization: `Bearer ${token}` } },
   });
@@ -69,7 +65,7 @@ Deno.serve(async (req: Request) => {
   const dbUrl = new URL("/rest/v1/qr_scan_events", supabaseUrl);
   dbUrl.searchParams.set(
     "select",
-    "id,scanned_at,campaign,city,region,country,country_code,latitude,longitude,timezone,user_agent,referrer,qr_type"
+    "id,scanned_at,campaign,city,region,country,country_code,latitude,longitude,timezone,user_agent,referrer,qr_type,province,district,subdistrict,location_permission,download_source,apk_version"
   );
   dbUrl.searchParams.set("qr_type", "eq.download");
   dbUrl.searchParams.set("scanned_at", `gte.${new Date(Date.now() - 90 * 86400000).toISOString()}`);
@@ -93,12 +89,19 @@ Deno.serve(async (req: Request) => {
   const devices = new Map<string, number>();
 
   for (const row of rows) {
-    const locKey = [row.country_code || "", row.region || "", row.city || ""].join("|");
+    const province = row.province || row.region || null;
+    const district = row.district || row.city || null;
+    const subdistrict = row.subdistrict || null;
+    const locKey = [row.country_code || "", province || "", district || "", subdistrict || ""].join("|");
     const loc = locations.get(locKey) || {
       country: row.country || "Unknown",
-      region: row.region || "Unknown",
-      city: row.city || "Unknown",
+      province: province || "Unknown",
+      district: district || null,
+      subdistrict: subdistrict || null,
+      city: row.city || district || null,
       country_code: row.country_code || null,
+      // Existing legacy rows may contain approximate IP coordinates. New browser-derived
+      // rows intentionally leave these fields null to avoid returning raw GPS.
       latitude: typeof row.latitude === "number" ? row.latitude : null,
       longitude: typeof row.longitude === "number" ? row.longitude : null,
       scans: 0,
@@ -134,8 +137,13 @@ Deno.serve(async (req: Request) => {
     campaign: row.campaign || "unknown",
     country: row.country,
     country_code: row.country_code,
-    region: row.region,
+    province: row.province || row.region,
+    district: row.district || row.city,
+    subdistrict: row.subdistrict,
     city: row.city,
+    location_permission: row.location_permission,
+    download_source: row.download_source,
+    apk_version: row.apk_version,
     latitude: row.latitude,
     longitude: row.longitude,
     timezone: row.timezone,

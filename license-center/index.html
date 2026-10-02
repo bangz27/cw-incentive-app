@@ -117,7 +117,7 @@
             <label>ช่วงเวลา<select id="analyticsRange"><option value="24h">24 ชั่วโมง</option><option value="7d" selected>7 วัน</option><option value="30d">30 วัน</option><option value="90d">90 วัน</option></select></label>
             <label>อุปกรณ์<select id="analyticsDevice"><option value="">ทุกอุปกรณ์</option></select></label>
             <label>Campaign<select id="analyticsCampaign"><option value="">ทุก Campaign</option></select></label>
-            <label class="analytics-search">ค้นหา<input id="analyticsSearch" type="search" placeholder="ประเทศ / จังหวัด / เมือง / campaign"></label>
+            <label class="analytics-search">ค้นหา<input id="analyticsSearch" type="search" placeholder="ประเทศ / จังหวัด / อำเภอ / ตำบล / campaign"></label>
           </div>
 
           <p id="analyticsError" class="form-error analytics-error" role="alert"></p>
@@ -130,7 +130,7 @@
 
           <div class="analytics-grid analytics-grid-main">
             <section class="search-card analytics-map-card">
-              <div class="section-head"><div><span class="eyebrow">GEO DISTRIBUTION</span><h3>Download map</h3></div><span class="hint">Approximate IP geolocation</span></div>
+              <div class="section-head"><div><span class="eyebrow">GEO DISTRIBUTION</span><h3>Download map</h3></div><span class="hint">Browser area / legacy IP</span></div>
               <div id="analyticsMap" class="analytics-map" aria-label="แผนที่การดาวน์โหลดโดยประมาณ"></div>
             </section>
             <section class="search-card">
