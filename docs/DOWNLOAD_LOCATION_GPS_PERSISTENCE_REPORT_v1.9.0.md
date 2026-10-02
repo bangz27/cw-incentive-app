@@ -59,6 +59,9 @@ Aggregate ปัจจุบันจาก Supabase: download events 9 รา�
 - Live Tracking GET — **HTTP 200**
 - Live Tracking HEAD — **HTTP 204**, ไม่สร้าง event
 - Live Dashboard unauthenticated — **HTTP 401**
+- GitHub Pages workflow — **success**, run `37056451776`
+- Production URL — `https://bangz27.github.io/cw-incentive-app/`
+- Feature commit — `6dc0321c38169639f97743258ac160bb8f5dd46f`
 
 ## Limitation
 
