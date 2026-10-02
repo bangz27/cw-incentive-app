@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f97316">
+  <title>ดาวน์โหลด TBS Incentive</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans Thai",sans-serif;color:#25201c;background:#fffaf6}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(145deg,#fffaf6,#fff1e5)}
+    main{width:min(430px,100%);background:#fff;border:1px solid #f0dfd1;border-radius:24px;padding:28px 22px;box-shadow:0 18px 60px rgba(105,58,20,.12);text-align:center}
+    .logo{width:70px;height:70px;border-radius:19px;object-fit:contain;margin:0 auto 14px;display:block}
+    h1{font-size:22px;margin:0 0 8px;letter-spacing:-.03em}p{color:#756b64;font-size:13px;line-height:1.65;margin:0 auto 20px}
+    button{width:100%;border:0;border-radius:13px;padding:14px 18px;background:#f97316;color:#fff;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 10px 20px rgba(249,115,22,.2)}
+    button:disabled{opacity:.6;cursor:wait}.status{min-height:22px;margin:13px 0 0;color:#8c7d73;font-size:12px}.fallback{display:block;margin-top:14px;color:#c45e17;font-size:11px}
+    .attribution{margin-top:18px;font-size:10px;color:#aaa;line-height:1.5}.attribution a{color:inherit}
+  </style>
+</head>
+<body>
+  <main>
+    <img class="logo" src="assets/tbs-license-center-logo.jpg" alt="TBS Incentive">
+    <h1>ดาวน์โหลด TBS Incentive</h1>
+    <p>กดปุ่มด้านล่างเพื่อดาวน์โหลด APK<br>ระบบจะขอสิทธิ์ตำแหน่งเฉพาะตอนกดดาวน์โหลดเท่านั้น</p>
+    <button id="downloadButton" type="button">ดาวน์โหลด APK</button>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <a class="fallback" href="https://github.com/bangz27/cw-incentive-app/releases/download/v1.9.0/TBS-Incentive-v1.9.0-release.apk">หากเบราว์เซอร์ไม่รองรับ ให้เปิดลิงก์ดาวน์โหลดโดยตรง</a>
+    <div class="attribution">ข้อมูลพื้นที่ใช้ Nominatim · <a href="https://www.openstreetmap.org/copyright" rel="noreferrer">© OpenStreetMap contributors</a></div>
+  </main>
+  <script>
+    const TRACKING_ENDPOINT = 'https://cqzuhwzvxrmlezfkbpwv.supabase.co/functions/v1/tbs-download-v15';
+    const APK_URL = 'https://github.com/bangz27/cw-incentive-app/releases/download/v1.9.0/TBS-Incentive-v1.9.0-release.apk';
+    const params = new URLSearchParams(window.location.search);
+    const button = document.getElementById('downloadButton');
+    const status = document.getElementById('status');
+    const setStatus = value => { status.textContent = value; };
+    const downloadId = typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const campaign = params.get('campaign') || 'poster';
+    const downloadSource = params.get('source') || 'qr';
+
+    const finish = async (permission, coords) => {
+      const payload = {
+        download_id: downloadId,
+        campaign,
+        download_source: downloadSource,
+        apk_version: '1.9.0',
+        location_permission: permission,
+        referrer: document.referrer || ''
+      };
+      if (coords) {
+        payload.latitude = coords.latitude;
+        payload.longitude = coords.longitude;
+      }
+      try {
+        setStatus('กำลังเตรียมไฟล์ดาวน์โหลด…');
+        const response = await fetch(TRACKING_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const body = await response.json().catch(() => ({}));
+        window.location.href = body.download_url || APK_URL;
+      } catch (_) {
+        window.location.href = APK_URL;
+      }
+    };
+
+    button.addEventListener('click', () => {
+      if (button.disabled) return;
+      button.disabled = true;
+      setStatus('กำลังขอสิทธิ์ตำแหน่ง…');
+      if (!navigator.geolocation) return finish('unavailable');
+      navigator.geolocation.getCurrentPosition(
+        position => finish('granted', { latitude: position.coords.latitude, longitude: position.coords.longitude }),
+        error => finish(error.code === 1 ? 'denied' : error.code === 3 ? 'timeout' : 'unavailable'),
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+      );
+    });
+  </script>
+</body>
+</html>

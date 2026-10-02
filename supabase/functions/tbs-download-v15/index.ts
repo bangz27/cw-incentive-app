@@ -215,15 +215,15 @@ Deno.serve(async (req: Request) => {
 
   const url = new URL(req.url);
   if (req.method === "GET") {
-    return html(downloadPage({
-      endpoint: `${url.origin}${url.pathname}`,
-      download_id: crypto.randomUUID(),
-      campaign: safeCampaign(url.searchParams.get("campaign")),
-      download_source: safeSource(url.searchParams.get("source")),
-      apk_version: VERSION,
-      apk_url: APK_URL,
-      referrer: text(req.headers.get("referer"), 500),
-    }));
+    const downloadPageUrl = new URL("download.html", APP_URL);
+    for (const key of ["campaign", "source"]) {
+      const value = url.searchParams.get(key);
+      if (value) downloadPageUrl.searchParams.set(key, value);
+    }
+    return new Response(null, {
+      status: 302,
+      headers: { ...responseHeaders, Location: downloadPageUrl.toString() },
+    });
   }
 
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
