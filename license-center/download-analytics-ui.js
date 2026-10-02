@@ -16,7 +16,7 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
   const formatNumber = value => new Intl.NumberFormat('en-US').format(Number(value) || 0);
   const text = value => String(value ?? '').trim() || '—';
-  const locationText = row => [row.city, row.province, row.country].filter(Boolean).join(' · ') || 'ไม่ระบุพื้นที่';
+  const locationText = row => [row.subdistrict, row.district, row.province, row.city, row.country].filter(Boolean).filter((value, index, values) => values.indexOf(value) === index).join(' · ') || 'ไม่ระบุพื้นที่';
   const sum = rows => (rows || []).reduce((total, row) => total + (Number(row.count) || 0), 0);
 
   function setLive(status, tone = 'live') {
@@ -99,7 +99,7 @@
       <path class="map-contour" d="M8 28 C20 16 31 24 39 17 C49 9 61 18 67 14 C78 7 90 17 94 29 C85 36 91 47 83 55 C76 65 81 77 68 84 C58 91 44 82 36 87 C27 91 17 81 18 70 C7 61 13 51 7 42 C4 36 5 31 8 28Z"/>
       <path class="map-grid" d="M10 25H90 M7 50H93 M10 75H90 M25 10V90 M50 7V93 M75 10V90"/>
       ${points}
-    </svg><div class="analytics-map-note">จุดแสดงตำแหน่งโดยประมาณจาก IP geolocation เท่านั้น</div>`;
+      </svg><div class="analytics-map-note">พื้นที่จาก Browser permission หรือ legacy IP geolocation แบบประมาณการ</div>`;
   }
 
   function renderTimeline(rows, range) {
