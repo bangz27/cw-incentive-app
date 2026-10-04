@@ -8,6 +8,8 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
 test('download tracking is click-gated and does not write on GET/HEAD', () => {
   const source = read('supabase/functions/tbs-download-v15/index.ts');
+  assert.match(source, /req\.method === "OPTIONS"/);
+  assert.match(source, /new Response\(null, \{ status: 204, headers: responseHeaders \}\)/);
   assert.match(source, /req\.method === "GET"/);
   assert.match(source, /req\.method === "HEAD"/);
   assert.match(source, /status: 302/);
