@@ -209,7 +209,7 @@ function downloadPage(config: Record<string, string>) {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response("ok", { status: 204, headers: responseHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: responseHeaders });
   // Health checks and browser prefetches must never create analytics events.
   if (req.method === "HEAD") return new Response(null, { status: 204, headers: responseHeaders });
 
