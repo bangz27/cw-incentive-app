@@ -1,11 +1,11 @@
 (function (global) {
   'use strict';
 
-  const version = '1.9.0';
+  const version = '2.0.0';
   global.TBSAppVersion = Object.freeze({
     name: version,
     display: `V${version}`,
-    code: 10
+    code: 11
   });
 
   if (typeof module !== 'undefined' && module.exports) module.exports = global.TBSAppVersion;

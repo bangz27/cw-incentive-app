@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const showToast = (message, tone = '') => { const toast = document.getElementById('toast'); if (!toast) return; toast.textContent = message; toast.classList.toggle('toast-success', tone === 'success'); toast.classList.add('show'); clearTimeout(window.__tbsToastTimer); window.__tbsToastTimer = setTimeout(() => { toast.classList.remove('show'); toast.classList.remove('toast-success'); }, 2000); };
   window.TBSShowToast = showToast;
-  const versionInfo = window.TBSAppVersion || { name: '1.9.0', display: 'V1.9.0', code: 10 };
+  const versionInfo = window.TBSAppVersion || { name: '2.0.0', display: 'V2.0.0', code: 11 };
   const updateChecker = window.TBSUpdateChecker?.createChecker?.({ currentVersion: versionInfo.name }) || null;
   const updateDialog = document.getElementById('update-dialog');
   const updateDialogClose = () => updateDialog?.classList.add('hidden');

@@ -16,7 +16,7 @@ const bannerPath = path.join(root, 'tbs_banner.png');
 const version = read('app-version.js');
 const updateChecker = read('update-checker.js');
 
-assert(version.includes("version = '1.9.0'"), 'App version must be 1.9.0');
+assert(version.includes("version = '2.0.0'"), 'App version must be 2.0.0');
 assert(updateChecker.includes('compareVersions'), 'Numeric version comparison is missing');
 assert(updateChecker.includes('api.github.com/repos/bangz27/cw-incentive-app/releases/latest'), 'GitHub Releases API source missing');
 assert(updateChecker.includes('createBundledRelease'), 'Current-version fallback is missing');

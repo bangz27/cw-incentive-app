@@ -15,7 +15,12 @@ test('V1.8.1 UI polish keeps dashboard hierarchy and responsive presentation', (
   assert.match(html, /id="home-recent"/);
   assert.match(html, /id="btn-calculate"/);
   assert.match(html, /id="history-search"/);
-  assert.match(css, /--color-primary:#F86A00/);
+  assert.match(css, /--color-primary:#FF7A59/);
+  assert.match(css, /--bg:#FBF6EE/);
+  assert.match(html, /แดชบอร์ดรายได้/);
+  assert.match(html, /รายได้ 7 วัน/);
+  assert.match(html, /กิจกรรมล่าสุด/);
+  assert.doesNotMatch(html, /Income Dashboard|7-Day Income|Recent Activity/);
   assert.match(css, /home-metric-grid/);
   assert.match(css, /home-chart-slot/);
   assert.match(css, /history-search/);

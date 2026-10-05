@@ -3,8 +3,8 @@
   "short_name": "TBS Incentive",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#FFFFFF",
-  "theme_color": "#FFB36B",
+  "background_color": "#FBF6EE",
+  "theme_color": "#FF7A59",
   "icons": [
     {"src": "playstore.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
     {"src": "appstore.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any"}

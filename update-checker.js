@@ -122,7 +122,7 @@
     const cooldownMs = Number.isFinite(options.cooldownMs) ? options.cooldownMs : DEFAULT_COOLDOWN_MS;
     const getCurrentVersion = typeof options.currentVersion === 'function'
       ? options.currentVersion
-      : () => options.currentVersion || global?.TBSAppVersion?.name || '1.9.0';
+      : () => options.currentVersion || global?.TBSAppVersion?.name || '2.0.0';
     const getBundledRelease = () => createBundledRelease(getCurrentVersion());
 
     const normalizeCachedRelease = value => {
