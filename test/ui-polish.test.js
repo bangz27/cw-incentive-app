@@ -15,8 +15,8 @@ test('V1.8.1 UI polish keeps dashboard hierarchy and responsive presentation', (
   assert.match(html, /id="home-recent"/);
   assert.match(html, /id="btn-calculate"/);
   assert.match(html, /id="history-search"/);
-  assert.match(css, /--color-primary:#FF7A59/);
-  assert.match(css, /--bg:#FBF6EE/);
+  assert.match(css, /--color-primary:#FF4B4B/);
+  assert.match(css, /--bg:#FFE14A/);
   assert.match(html, /แดชบอร์ดรายได้/);
   assert.match(html, /รายได้ 7 วัน/);
   assert.match(html, /กิจกรรมล่าสุด/);

@@ -42,7 +42,7 @@
     const context = canvas.getContext('2d');
     chart = new global.Chart(context, {
       type: 'bar',
-      data: { labels: keys.map(label), datasets: [{ data: values, backgroundColor: '#FF7A59', borderRadius: 8, maxBarThickness: 30 }] },
+      data: { labels: keys.map(label), datasets: [{ data: values, backgroundColor: '#6C4BFF', borderRadius: 8, maxBarThickness: 30 }] },
       options: {
         responsive: true,
         maintainAspectRatio: false,
